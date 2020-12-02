@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RetroCore.Network
 {
@@ -13,13 +15,14 @@ namespace RetroCore.Network
     {
         public ProxySocket Socket { get; set; }
         public byte[] Buffer { get; set; } // buffer
-
+        private SemaphoreSlim Semaphore;
         private const int BufferSize = 16384; // low values -> in cropped packets.
         public bool isDisposed = false;
         private Client Client;
 
         public SocketClient(Client client)
         {
+            this.Semaphore = new SemaphoreSlim(1);
             this.Client = client;
             this.Buffer = new byte[BufferSize];
             this.Socket = new ProxySocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -65,6 +68,7 @@ namespace RetroCore.Network
                 if (bytesReceived > 0)
                 {
                     var data = Encoding.UTF8.GetString(this.Buffer, 0, bytesReceived);
+  
                     foreach (var packet in data.Replace("\x0a", string.Empty).Split('\x00').Where(x => x != ""))
                     {
                         StringHelper.WriteLine($"→ RCV {packet}");
@@ -79,10 +83,14 @@ namespace RetroCore.Network
             }
         }
 
-        public void SendPacket(string packet)
+        public async Task SendPacket(string packet)
         {
+            if (!this.Socket.Connected)
+                return;
+            await Semaphore.WaitAsync().ConfigureAwait(false); //awaiting current tasks to finish
             this.Socket.Send(Encoding.UTF8.GetBytes(string.Format("{0}\n\x00", packet)));
             StringHelper.WriteLine($"← SND {packet.Replace("\n", "[lineReturn]")}", ConsoleColor.Cyan);
+            Semaphore.Release(); // releasing semaphore
         }
 
         private void Disconnect()

@@ -1,27 +1,29 @@
 ﻿using RetroCore.Helpers;
 using RetroCore.Network.Dispatcher;
+using RetroCore.Others;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RetroCore.Network.Frames.Auth
 {
     public class Authentification : FrameTemplate
     {
         [PacketId("HC")]
-        public void Connection(Client client, string packet)
+        public Task Connection(Client client, string packet) => Task.Run(async () =>
         {
-            var key = packet.Substring(2, 32);
+            var key = PacketsReceiver.GetPacketContent(packet);
             StringHelper.WriteLine($"[{client.Username}:{client.Password}] got key : {key}");
-            client.Network.SendPacket(Constants.GameVersion);
-            client.Network.SendPacket(client.Username + "\n" + StringHelper.Encrypt(client.Password, key));
-            client.Network.SendPacket("Af");
-        }
+            await client.Network.SendPacket(Constants.GameVersion);
+            await client.Network.SendPacket(client.Username + "\n" + StringHelper.Encrypt(client.Password, key));
+            await client.Network.SendPacket("Af");
+        });
 
         [PacketId("AQ")]
-        public void AuthentificationSuccess(Client client, string packet)
+        public Task AuthentificationSuccess(Client client, string packet) => Task.Run(async () =>
         {
-            client.Network.SendPacket("Ax");
-        }
+            await client.Network.SendPacket("Ax");
+        });
 
         [PacketId("Af")]
         public void AuthentificationQueue(Client client, string packet)
@@ -30,12 +32,30 @@ namespace RetroCore.Network.Frames.Auth
             StringHelper.WriteLine($"Queue position {packet.Split('|')[0]}/{packet.Split('|')[1]}");
         }
 
+        [PacketId("AH")]
+        public Task GetServersStates(Client client, string packet) => Task.Run(async () =>
+        {
+            string[] availableServersDatas = PacketsReceiver.GetPacketContent(packet).Substring(2).Split('|');
+
+
+            foreach(string servDatas in availableServersDatas)
+            {
+                string[] splitter = servDatas.Split(';');
+                int id = int.Parse(splitter[0]);
+                ServerStatus estado = (ServerStatus)byte.Parse(splitter[1]);
+            }
+        });
+
         [PacketId("M013")]
         public void WrongSocketAdress(Client client, string packet)
         {
             StringHelper.WriteLine($"[{client.Username}:{client.Password}] servers are in maintenance..", ConsoleColor.Yellow);
         }
-
+        [PacketId("Ad")]
+        public void AuthentificationNickname(Client client, string packet)
+        {
+            StringHelper.WriteLine($"[Auth] Account {client.Username} is connected !", ConsoleColor.Blue);
+        }
         [PacketId("AlE")]
         public void AuthentificationFailed(Client client, string packet)
         {
@@ -98,12 +118,12 @@ namespace RetroCore.Network.Frames.Auth
         }
 
         [PacketId("AxK")]
-        public void ServerList(Client client, string packet)
+        public Task ServerList(Client client, string packet) => Task.Run(async () =>
         {
-            var rawPacket = packet.Substring(3).Split('|').Distinct().ToList();
+            var rawPacket = PacketsReceiver.GetPacketContent(packet).Split('|').Distinct().ToList();
             var subscriptionEndDate = long.Parse(rawPacket[0]);
-            string str = subscriptionEndDate != 0 ? "and subscribed" : "";
-            StringHelper.WriteLine($"Account {client.Username} working {str}", ConsoleColor.Blue);
-        }
+           
+           // await client.Network.SendPacket($"AX603");
+        });
     }
 }

@@ -27,7 +27,7 @@ namespace RetroCore.Network.Dispatcher
 
                     Methods.Add(new PacketData(instance, attr.Value, type));
                 }
-                StringHelper.WriteLine($"{Methods.Count()} packets registered !", ConsoleColor.Cyan);
+                StringHelper.WriteLine($"{Methods.Count()} packet(s) have been registered !", ConsoleColor.Cyan);
 
                 IsInitialized = true;
             }
