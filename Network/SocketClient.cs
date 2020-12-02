@@ -1,5 +1,6 @@
 ﻿using Org.Mentalis.Network.ProxySocket;
 using RetroCore.Helpers;
+using RetroCore.Network.Dispatcher;
 using System;
 using System.Linq;
 using System.Net;
@@ -14,7 +15,7 @@ namespace RetroCore.Network
         public byte[] Buffer { get; set; } // buffer
 
         private const int BufferSize = 16384; // low values -> in cropped packets.
-
+        public bool isDisposed = false;
         private Client Client;
 
         public SocketClient(Client client)
@@ -67,13 +68,7 @@ namespace RetroCore.Network
                     foreach (var packet in data.Replace("\x0a", string.Empty).Split('\x00').Where(x => x != ""))
                     {
                         StringHelper.WriteLine($"→ RCV {packet}");
-                        if (packet.StartsWith("HC"))
-                        {
-                            var key = packet.Substring(2, 32);
-                            SendPacket(Constants.GameVersion);
-                            SendPacket(Client.Username + "\n" + StringHelper.Encrypt(Client.Password, key));
-                            SendPacket("Af");
-                        }
+                        PacketsReceiver.Receive(this.Client, packet);
                     }
                 }
                 Receive();
@@ -102,6 +97,10 @@ namespace RetroCore.Network
                 }
                 catch { }
             }
+        }
+        public void Dispose()
+        {
+
         }
     }
 }

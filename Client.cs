@@ -11,12 +11,12 @@ namespace RetroCore
     {
         public string Username { get; protected set; }
         public string Password { get; protected set; }
-
+        public SocketClient Network;
         public Client(string user, string pass)
         {
             this.Username = user;
             this.Password = pass;
-            SocketClient socketClient = new SocketClient(this);
+            Network = new SocketClient(this);
            
         }
     }
