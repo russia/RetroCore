@@ -17,7 +17,7 @@ namespace RetroCore.Network
         public ProxySocket Socket { get; set; }
         public byte[] Buffer { get; set; } // buffer
         private SemaphoreSlim Semaphore;
-        private const int BufferSize = 16384; // low values -> in cropped packets.
+        private const int BufferSize = 16384;
         public bool isDisposed = false;
         private Client Client;
         public PingManager Ping;
@@ -88,9 +88,7 @@ namespace RetroCore.Network
                     //    finalStr += value + " ";
                     //}
 
-                    Ping.Pings.Add(Environment.TickCount - Ping.Ticks);
-                    if (Ping.Pings.Count > 48)
-                        Ping.Pings.Clear();
+                    Ping.Update();
 
                     foreach (var packet in data.Replace("\x0a", string.Empty).Split('\x00').Where(x => x != ""))
                     {

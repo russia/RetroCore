@@ -45,18 +45,16 @@ namespace RetroCore.Network.Frames.Auth
         }
 
         [PacketId("AH")]
-        public Task GetServersStates(Client client, string packet) => Task.Run(async () =>
+        public void GetServersStates(Client client, string packet)
         {
             string[] availableServersDatas = PacketsReceiver.GetPacketContent(packet).Substring(2).Split('|');
-
-
             foreach(string servDatas in availableServersDatas)
             {
                 string[] splitter = servDatas.Split(';');
                 int id = int.Parse(splitter[0]);
                 ServerStatus state = (ServerStatus)byte.Parse(splitter[1]);
             }
-        });
+        }
 
         [PacketId("M013")]
         public void WrongSocketAdress(Client client, string packet)
@@ -130,7 +128,7 @@ namespace RetroCore.Network.Frames.Auth
         }
 
         [PacketId("AxK")]
-        public Task ServerList(Client client, string packet) => Task.Run(async () =>
+        public Task ServersList(Client client, string packet) => Task.Run(async () =>
         {
             var rawPacket = PacketsReceiver.GetPacketContent(packet).Split('|').Distinct().ToList();
             DateTime subEndDate = StringHelper.UnixTimeStampToDateTime(long.Parse(rawPacket[0]));
@@ -140,14 +138,14 @@ namespace RetroCore.Network.Frames.Auth
         });
 
         [PacketId("AXK")]
-        public Task GetServerAdress(Client client, string packet) => Task.Run(async () =>
+        public void GetServerAddress(Client client, string packet)
         {
             client.GameTicket = packet.Substring(14);
             string ip = Hash.GetIp(packet.Substring(3, 8));
             int port = Hash.GetPort(packet.Substring(11, 3).ToCharArray());
             StringHelper.WriteLine($"[{client.Username}:{client.Password}] is switching to game : {ip}:{port}", ConsoleColor.Green);
             client.Network.Connection(ip, port);
-        });
+        }
     }
-}//172.65.206.193", 443)
+}
 

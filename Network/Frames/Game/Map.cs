@@ -10,7 +10,7 @@ namespace RetroCore.Network.Frames.Game
     class Map : FrameTemplate
     {
         [PacketId("GDM")]
-        public Task get_Nuevo_Mapa(Client Client, string packet) => Task.Run(async () =>
+        public Task GetMapData(Client Client, string packet) => Task.Run(async () =>
         {
             await Client.Network.SendPacket("GI");
         });

@@ -29,5 +29,12 @@ namespace RetroCore.Manager
             }
             return total_pings / Pings.Count;
         }
+
+        public void Update()
+        {
+            Pings.Add(GetActualPing());
+            if (Pings.Count > 48)
+                Pings.Clear();
+        }
     }
 }

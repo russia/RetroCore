@@ -55,7 +55,7 @@ namespace RetroCore.Network.Dispatcher
             {
                 methods.First().Methode.Invoke(methods.First().Instance, new object[] { client, packet });
             }
-            catch (Exception ex)
+            catch 
             {
                 if (client.Network.isDisposed)
                     return;
