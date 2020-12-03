@@ -11,6 +11,8 @@ namespace RetroCore
     {
         public string Username { get; protected set; }
         public string Password { get; protected set; }
+
+        public string GameTicket { get; set; }
         public SocketClient Network;
         public Client(string user, string pass)
         {

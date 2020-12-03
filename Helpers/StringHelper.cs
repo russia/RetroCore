@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace RetroCore.Helpers
 {
     public class StringHelper
     {
-        private static readonly char[] HashTable = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-                't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'};
+        
+        private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+        private static Random random = new Random();
 
         public static void WriteLine(string msg, ConsoleColor color = ConsoleColor.White)
         {
@@ -16,14 +18,41 @@ namespace RetroCore.Helpers
             Console.WriteLine(DateTime.Now.ToString("[HH:mm:ss:fff] ") + msg);
         }
 
-        public static string Encrypt(string password, string key)
+        public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
         {
-            StringBuilder str = new StringBuilder().Append("#1");
-            for (int i = 0; i < password.Length; i++)
+            // Unix timestamp is seconds past epoch
+            return DateTimeOffset.FromUnixTimeMilliseconds(unixTimeStamp).UtcDateTime;
+        }
+
+        public static string GetRandomChar()
+        {
+            return chars[random.Next(0, chars.Count())].ToString();
+        }
+
+        public static string GetRandomNetworkKey()
+        {
+            var str1 = "";
+            int rnd = random.Next(1, 128) + 128;
+            int index = 0;
+            while (index < rnd)
             {
-                str.Append(HashTable[(password[i] / 16 + key[i]) % HashTable.Length]).Append(HashTable[(password[i] % 16 + key[i]) % HashTable.Length]);
+                str1 = str1 + GetRandomChar();
+                index = index + 1;
             }
-            return str.ToString();
+            string result = Checksum(str1) + str1;
+            return result + Checksum(result);
+        }
+
+        public static string Checksum(string content)
+        {
+            string hash;
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                hash = BitConverter.ToString(
+                  md5.ComputeHash(Encoding.UTF8.GetBytes(content))
+                ).Replace("-", String.Empty);
+            }
+            return hash;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Org.Mentalis.Network.ProxySocket;
 using RetroCore.Helpers;
+using RetroCore.Manager;
 using RetroCore.Network.Dispatcher;
 using System;
 using System.Linq;
@@ -19,14 +20,22 @@ namespace RetroCore.Network
         private const int BufferSize = 16384; // low values -> in cropped packets.
         public bool isDisposed = false;
         private Client Client;
+        public PingManager Ping;
 
         public SocketClient(Client client)
         {
             this.Semaphore = new SemaphoreSlim(1);
             this.Client = client;
+            Connection(Constants.AuthAddress, Constants.AuthPort);
+            this.Ping = new PingManager();
+        }
+
+        public void Connection(string ip, int port)
+        {
+            Disconnect();
             this.Buffer = new byte[BufferSize];
             this.Socket = new ProxySocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var result = this.Socket.BeginConnect(new IPEndPoint(Constants.AuthAddress, Constants.AuthPort), null, this.Socket).AsyncWaitHandle.WaitOne(3000, true);
+            var result = this.Socket.BeginConnect(new IPEndPoint(IPAddress.Parse(ip), port), null, this.Socket).AsyncWaitHandle.WaitOne(3000, true);
 
             if (!result)
             {
@@ -61,14 +70,28 @@ namespace RetroCore.Network
                 var bytesReceived = args.BytesTransferred;
                 if (args.LastOperation != SocketAsyncOperation.Receive || bytesReceived == 0)
                 {
-                    Disconnect();
+                    //Disconnect();
                     return;
                 }
 
                 if (bytesReceived > 0)
                 {
                     var data = Encoding.UTF8.GetString(this.Buffer, 0, bytesReceived);
-  
+                    //string finalStr = "";
+                    //foreach (var value in this.Buffer)
+                    //{
+                    //    if (value == 0)
+                    //    {
+                    //        StringHelper.WriteLine(finalStr, ConsoleColor.Gray);
+                    //        break;
+                    //    }
+                    //    finalStr += value + " ";
+                    //}
+
+                    Ping.Pings.Add(Environment.TickCount - Ping.Ticks);
+                    if (Ping.Pings.Count > 48)
+                        Ping.Pings.Clear();
+
                     foreach (var packet in data.Replace("\x0a", string.Empty).Split('\x00').Where(x => x != ""))
                     {
                         StringHelper.WriteLine($"→ RCV {packet}");
@@ -106,9 +129,9 @@ namespace RetroCore.Network
                 catch { }
             }
         }
+
         public void Dispose()
         {
-
         }
     }
 }

@@ -43,7 +43,7 @@ namespace RetroCore.Network.Dispatcher
             List<PacketData> methods = Methods.FindAll(m => packet.StartsWith(m.Name)); //we should NEVER have more than 1 packet
             if (!methods.Any())
             {
-                StringHelper.WriteLine($"X Received unknowed packet -> [{packet}]", ConsoleColor.Yellow);
+                //StringHelper.WriteLine($"X Received unknowed packet -> [{packet}]", ConsoleColor.Yellow);
                 return;
             }
             if (methods.Count > 1)
