@@ -11,14 +11,14 @@ namespace RetroCore.Helpers
         private static readonly char[] HashTable = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
                 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'};
-        public static string GetIp(string paquete)
+        public static string GetIp(string packet)
         {
             StringBuilder ip = new StringBuilder();
 
             for (int i = 0; i < 8; i += 2)
             {
-                int ascii1 = paquete[i] - 48;
-                int ascii2 = paquete[i + 1] - 48;
+                int ascii1 = packet[i] - 48;
+                int ascii2 = packet[i + 1] - 48;
 
                 if (i != 0)
                     ip.Append('.');

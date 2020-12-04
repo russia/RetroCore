@@ -13,6 +13,7 @@ namespace RetroCore.Network.Frames.Game
         public Task GetMapData(Client Client, string packet) => Task.Run(async () =>
         {
             await Client.Network.SendPacket("GI");
+            Client.MapManager.UpdateMap(packet);
         });
     }
 }
