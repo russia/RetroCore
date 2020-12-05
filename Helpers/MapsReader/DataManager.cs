@@ -65,7 +65,6 @@ namespace RetroCore.Helpers.MapsReader
 
             foreach (var langname in RequiredLangs)
                 DownloadLang(langname);
-            
         }
 
         public static void DownloadMap(string id, string mapid)
@@ -91,11 +90,42 @@ namespace RetroCore.Helpers.MapsReader
                 DownloadMap(id, mapid);
             }
             SwfDecompiledMap map = ReadSwfMap((Constants.MapsPath + $"\\{id}" + "_" + $"{mapid}X.swf"));
-            //read map lang file here to get x,y coords values
+            //TODO read map lang file here to get x,y coords values
+            //ReadSwfLang($"{Constants.LangsPath}\\maps_fr_{LangsVersion}.swf");
             map.DecypheredMapData = DecypherData(map.MapData, map_key);
             return map;
         }
+        //public static SwfDecompiledMap ReadSwfLang(string path)
+        //{
+        //    var map = new SwfDecompiledMap();
+        //    SwfReader Reader = new SwfReader(path);
+        //    Swf swf = Reader.ReadSwf();
 
+        //    IEnumerator enumerator = swf.Tags.GetEnumerator();
+        //    while (enumerator.MoveNext())
+        //    {
+        //        BaseTag current = (BaseTag)enumerator.Current;
+        //        if (current.ActionRecCount != 0)
+        //        {
+        //            string sb = "";
+        //            IEnumerator currentenumerator = current.GetEnumerator();
+        //            while (currentenumerator.MoveNext())
+        //            {
+        //                Decompiler decompiler = new Decompiler(swf.Version);
+        //                ArrayList actions = decompiler.Decompile((byte[])currentenumerator.Current);
+
+        //                foreach (BaseAction obj in actions)
+        //                    sb += obj.ToString();
+        //            }
+           
+                    
+        //            Console.WriteLine("1");
+        //        }
+        //    }
+        //    Reader.Close();
+        //    swf = null;
+        //    return map;
+        //}
         public static SwfDecompiledMap ReadSwfMap(string path)
         {
             var map = new SwfDecompiledMap();
@@ -122,11 +152,11 @@ namespace RetroCore.Helpers.MapsReader
                     map.Id = int.Parse(Gettok(Gettok(sb, "push", 9), " ", 2));
                     map.Width = int.Parse(Gettok(Gettok(sb, "push", 11), " ", 2)); //x
                     map.Height = int.Parse(Gettok(Gettok(sb, "push", 13), " ", 2)); // y
-                    Reader.Close();
-                    swf = null;
+                   
                 }
             }
-
+            Reader.Close();
+            swf = null;
             return map;
         }
 

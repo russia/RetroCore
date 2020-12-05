@@ -9,7 +9,7 @@ namespace RetroCore.Others
     public enum ServerStatus
     {
         OFF,
-        CONNECTE,
+        ON,
         SAVING
     }
     public enum CellsType

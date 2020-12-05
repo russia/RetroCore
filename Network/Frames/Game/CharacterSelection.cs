@@ -8,7 +8,6 @@ namespace RetroCore.Network.Frames.Game
         [PacketId("HG")]
         public Task HelloGame(Client Client, string packet) => Task.Run(async () =>
         {
-            //await Task.Delay(250);
             await Client.Network.SendPacket("AT" + Client.GameTicket);
         });
 
@@ -30,16 +29,15 @@ namespace RetroCore.Network.Frames.Game
         [PacketId("ALK")]
         public Task GetCharactersList(Client Client, string packet) => Task.Run(async () =>
         {
-            //await Task.Delay(1000);
             await Client.Network.SendPacket("AS" + 240042919); //240042919 temp
-            await Client.Network.SendPacket("Af"); 
+            Client.CharacterId = 240042919;
+            await Client.Network.SendPacket("Af");
         });
 
         [PacketId("ASK")]
         public Task GetSelectedCharacter(Client Client, string packet) => Task.Run(async () =>
         {
             await Client.Network.SendPacket("GC1");
-
         });
     }
 }

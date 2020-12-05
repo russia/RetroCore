@@ -69,61 +69,7 @@ namespace RetroCore.Network.Frames.Auth
         [PacketId("AlE")]
         public void AuthentificationFailed(Client client, string packet)
         {
-            var error = PacketsReceiver.GetPacketContent(packet);
-            string reason = "unknown";
-            string errorbis = error.Substring(0, 1);
-            switch (errorbis)
-            {
-                case "n":
-                    reason = "CONNECT_NOT_FINISHED";
-                    break;
-
-                case "a":
-                case "c":
-                case "d":
-                    reason = "ALREADY_LOGGED";
-                    client.Network.Dispose();
-                    break;
-
-                case "k":
-                    reason = "TEMP_BANNED";
-                    break;
-
-                case "v":
-                    reason = "BAD_VERSION";
-                    Constants.GameVersion = error.Replace("v", "");
-                    break;
-
-                case "p":
-                    reason = "NOT_PLAYER";
-                    break;
-
-                case "b":
-                    reason = "BANNED";
-                    break;
-
-                case "w":
-                    reason = "SERVER_FULL";
-                    client.Network.Dispose();
-                    break;
-
-                case "o":
-                    reason = "OLD_ACCOUNT";
-                    break;
-
-                case "e":
-                    reason = "OLD_ACCOUNT_USE_NEW";
-                    break;
-
-                case "m":
-                    reason = "MAINTAIN_ACCOUNT";
-                    break;
-
-                case "f":
-                    reason = "WRONG_PASSWORD";
-                    break;
-            }
-            StringHelper.WriteLine($"[{client.Username}:{client.Password}] can't login, reason : {reason}", ConsoleColor.Red);
+            StringHelper.WriteLine($"[{client.Username}:{client.Password}] can't login.", ConsoleColor.Red);
             client.Network.Dispose();
         }
 
