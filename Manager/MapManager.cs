@@ -1,30 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RetroCore.Helpers.MapsReader;
 
 namespace RetroCore.Manager
 {
     public class MapManager
     {
-        public Client _client;
-
+        public short Id { get; set; }
+        public byte Width { get; set; }
+        public byte Height { get; set; }
+        public Client _client { get; set; }
+        public sbyte x { get; set; }
+        public sbyte y { get; set; }
+        public bool map_updated { get; private set; }
         public MapManager(Client client)
         {
             this._client = client;
-
         }
 
         #region updates
 
-        public void UpdateMap(string packet)
+        public void UpdateMapData(string packet)
         {
+            //entities.Clear();
+            //interactives.Clear();
             string[] splitted = packet.Split('|');
-            short id = short.Parse(splitted[0]);
+            SwfDecompiledMap map = DataManager.GetSwfContent(splitted[1], splitted[2], splitted[3]);
+            Id = (short)map.Id;
+            x = sbyte.Parse(map.Width.ToString());
+            y = sbyte.Parse(map.Height.ToString());
+          //  descomprimir_mapa(map.DecypheredMapData);
+
+
+            map_updated = true;
         }
 
-        #endregion
-
+        #endregion updates
     }
 }

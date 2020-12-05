@@ -1,4 +1,5 @@
-﻿using RetroCore.Network.Dispatcher;
+﻿using RetroCore.Helpers.MapsReader;
+using RetroCore.Network.Dispatcher;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,9 @@ namespace RetroCore.Network.Frames.Game
         [PacketId("GDM")]
         public Task GetMapData(Client Client, string packet) => Task.Run(async () =>
         {
-            await Client.Network.SendPacket("GI");
-            Client.MapManager.UpdateMap(packet);
+            Client.MapManager.UpdateMapData(packet);
+            await Client.Network.SendPacket("GI");                   
+            //await Client.Network.SendPacket("BYI");                   
         });
     }
 }
