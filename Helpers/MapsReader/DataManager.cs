@@ -131,13 +131,17 @@ namespace RetroCore.Helpers.MapsReader
                     var regex = @"getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push";
                     var matches = Regex.Matches(sb, regex);
 
-                    foreach (Match match in matches)
+                    foreach (Match match in matches) {
                         GlobalMapsInfos.Add(new MapCoordinates(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[5].Value)));
+                        Console.Write("\r{0} maps..", GlobalMapsInfos.Count()); 
+                    }
+                        
                 }
             }
 
             Reader.Close();
             swf = null;
+            Console.WriteLine("\n");
             StringHelper.WriteLine($"[DataManager] {GlobalMapsInfos.Count()} maps added to list !", ConsoleColor.Cyan);
         }
 
