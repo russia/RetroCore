@@ -6,7 +6,6 @@ namespace RetroCore.Helpers
 {
     public class StringHelper
     {
-        
         private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         private static Random random = new Random();

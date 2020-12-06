@@ -1,8 +1,8 @@
-﻿using System;
+﻿using RetroCore.Manager.MapManager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RetroCore.Helpers
 {
@@ -11,6 +11,7 @@ namespace RetroCore.Helpers
         private static readonly char[] HashTable = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
                 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'};
+
         public static string GetIp(string packet)
         {
             StringBuilder ip = new StringBuilder();
@@ -28,16 +29,65 @@ namespace RetroCore.Helpers
             return ip.ToString();
         }
 
+        public static short GetCellIdByHash(string hash)
+        {
+            char char1 = hash[0], char2 = hash[1];
+            short code1 = 0, code2 = 0, a = 0;
+
+            while (a < HashTable.Length)
+            {
+                if (HashTable[a] == char1)
+                    code1 = (short)(a * 64);
+
+                if (HashTable[a] == char2)
+                    code2 = a;
+
+                a++;
+            }
+            return (short)(code1 + code2);
+        }
+
+        public static string getHashedPath(List<Cell> Path)
+        {
+            Cell DestinationCell = Path.Last();
+
+            if (Path.Count < 3)
+                return DestinationCell.get_Direction(Path.First()) + Hash.getCellChar(DestinationCell.Id);
+
+            StringBuilder pathfinder = new StringBuilder();
+            char lastDirection = Path[1].get_Direction(Path.First()), currentDirection;
+
+            for (int i = 2; i < Path.Count; i++)
+            {
+                Cell actualCell = Path[i];
+                Cell previousCell = Path[i - 1];
+                currentDirection = actualCell.get_Direction(previousCell);
+
+                if (lastDirection != currentDirection)
+                {
+                    pathfinder.Append(lastDirection);
+                    pathfinder.Append(Hash.getCellChar(previousCell.Id));
+
+                    lastDirection = currentDirection;
+                }
+            }
+
+            pathfinder.Append(lastDirection);
+            pathfinder.Append(Hash.getCellChar(DestinationCell.Id));
+            return pathfinder.ToString();
+        }
+
+        public static string getCellChar(short cellId) => HashTable[cellId / 64] + "" + HashTable[cellId % 64];
+
         public static int GetPort(char[] chars)
         {
-            //if (chars.Length != 3)
-                
             int port = 0;
             for (int i = 0; i < 2; i++)
                 port += (int)(Math.Pow(64, 2 - i) * GetHash(chars[i]));
             port += GetHash(chars[2]);
             return port;
         }
+
         public static short GetHash(char ch)
         {
             for (short i = 0; i < HashTable.Length; i++)
@@ -46,7 +96,7 @@ namespace RetroCore.Helpers
 
             throw new IndexOutOfRangeException(ch + " is not in the hash array.");
         }
-      
+
         public static string Encrypt(string password, string key)
         {
             StringBuilder str = new StringBuilder().Append("#1");

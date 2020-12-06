@@ -1,7 +1,7 @@
-﻿using RetroCore.Manager.MapManager;
+﻿using RetroCore.Helpers;
+using RetroCore.Manager.MapManager;
 using RetroCore.Manager.MapManager.PathFinder;
 using RetroCore.Network;
-using System;
 using System.Threading.Tasks;
 
 namespace RetroCore
@@ -39,13 +39,23 @@ namespace RetroCore
 
         #region Events
 
+        public async Task AwaitMovementEnds(Cell destination, byte gkk)
+        {
+            await Task.Delay(PathTiming.GetMovementTiming(MapManager.CurrentCell, MapManager.ActualPath, false));
+
+            await this.Network.SendPacket("GKK" + gkk);
+            MapManager.CurrentCell = destination;
+
+            MapManager.ActualPath = null;
+        }
+
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(800); //todo find an other packet
-            var path = PathFinderManager.GetPath(433);
+            var path = PathFinderManager.GetPath(450);
             path.Reverse();
-            foreach (var cell in path)
-                Console.Write(cell.Id + " ->");
+            string packetContent = "GA001" + Hash.getHashedPath(path);
+            await this.Network.SendPacket(packetContent);
         });
 
         #endregion Events

@@ -23,4 +23,11 @@ namespace RetroCore.Others
         PATH1 = 6,
         PATH2 = 7
     }
+    internal enum AnimationType
+    {
+        MOUNT,
+        RUNNING,
+        WALKING,
+        PHANTOM
+    }
 }

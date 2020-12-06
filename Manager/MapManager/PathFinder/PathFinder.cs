@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace RetroCore.Manager.MapManager.PathFinder
 {
@@ -18,12 +19,15 @@ namespace RetroCore.Manager.MapManager.PathFinder
 
         public void Update()
         {
+            while (!Client.MapManager.Map_updated)
+                Thread.Sleep(500);
             mapCellsWalkable = Client.MapManager.Cells.Where(x => x.is_Walkable() == true).ToList();
         }
 
         public List<Cell> GetPath(short cellId)
         {
             Update();
+
             Cell StartCell = Client.MapManager.CurrentCell;
             StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
             Cell DestinationCell = Client.MapManager.GetCellById(cellId);
@@ -48,10 +52,11 @@ namespace RetroCore.Manager.MapManager.PathFinder
                         {
                             Path.Add(DestinationCell);
                             break;
-                        }                         
+                        }
                         Path.Add(tempCell.Parent);
                         tempCell = tempCell.Parent;
                     }
+                    Client.MapManager.ActualPath = Path;
                     return Path;
                 }
 

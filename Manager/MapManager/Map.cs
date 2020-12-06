@@ -4,6 +4,7 @@ using RetroCore.Manager.MapManager.Interactives;
 using RetroCore.Others;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RetroCore.Manager.MapManager
@@ -19,7 +20,7 @@ namespace RetroCore.Manager.MapManager
         public bool Map_updated { get; private set; }
 
         public Cell CurrentCell { get; set; }
-
+        public List<Cell> ActualPath;
         public ConcurrentDictionary<int, Entity> Entities;
         public ConcurrentDictionary<int, InteractiveObject> Interactives;
         public Cell[] Cells;
@@ -27,12 +28,16 @@ namespace RetroCore.Manager.MapManager
         public Map(Client client)
         {
             this._client = client;
+            ActualPath = new List<Cell>();
             Entities = new ConcurrentDictionary<int, Entity>();
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
         }
+
         #region Getters
+
         public Cell GetCellById(short CellId) => Cells[CellId];
-        #endregion
+
+        #endregion Getters
 
         #region updates
 

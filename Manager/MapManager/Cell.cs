@@ -1,26 +1,26 @@
 ﻿using RetroCore.Manager.MapManager.Interactives;
 using RetroCore.Others;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace RetroCore.Manager.MapManager
 {
     public class Cell
     {
-        public short Id { get; private set; }
-        public bool Active { get; private set; }
-        public CellsType Type { get; private set; }
-        public bool isLinear { get; private set; } = false;
-        public byte layer_ground_level { get; private set; }
-        public byte layer_ground_slope { get; private set; }
-        public short layer_object_1_num { get; private set; }
-        public short layer_object_2_num { get; private set; }
-        public InteractiveObject objectInteractive { get; private set; }
+        public short Id { get; set; }
+        public bool Active { get; set; }
+        public CellsType Type { get; set; }
+        public bool isLinear { get; set; } = false;
+        public byte layer_ground_level { get; set; }
+        public byte layer_ground_slope { get; set; }
+        public short layer_object_1_num { get; set; }
+        public short layer_object_2_num { get; set; }
+        public InteractiveObject InteractiveObject { get; set; }
         public int x { get; set; } = 0;
         public int y { get; set; } = 0;
 
         #region pathfinder
+
         public int Cost { get; set; }
         public int Distance { get; set; }
         public int CostDistance => Cost + Distance;
@@ -41,7 +41,7 @@ namespace RetroCore.Manager.MapManager
             this.Distance = 1;
         }
 
-        #endregion
+        #endregion pathfinder
 
         public Cell(short _id, bool active, CellsType _type, bool _isLinear, byte _level, byte _slope, short _interactiveObjId, short _layer_object_1_num, short _layer_object_2_num, Map _map)
         {
@@ -58,8 +58,8 @@ namespace RetroCore.Manager.MapManager
 
             if (_interactiveObjId != -1)
             {
-                objectInteractive = new InteractiveObject(_interactiveObjId, this);
-                _map.Interactives.TryAdd(Id, objectInteractive);
+                InteractiveObject = new InteractiveObject(_interactiveObjId, this);
+                _map.Interactives.TryAdd(Id, InteractiveObject);
             }
 
             byte Width = _map.Width;
@@ -71,7 +71,6 @@ namespace RetroCore.Manager.MapManager
         }
 
         public int get_Distance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
-
 
         public bool get_IsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
 
@@ -94,10 +93,10 @@ namespace RetroCore.Manager.MapManager
 
         public bool is_Teleporter() => teleportTextures.Contains(layer_object_1_num) || teleportTextures.Contains(layer_object_2_num);
 
-        public bool is_Interactive() => Type == CellsType.INTERACTIVE_OBJECT || objectInteractive != null;
+        public bool is_Interactive() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null;
 
         public bool is_Walkable() => Active && Type != CellsType.NOT_WALKABLE && !is_Interactive_Walkable();
 
-        public bool is_Interactive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || objectInteractive != null && !objectInteractive.model.Walkable;
+        public bool is_Interactive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && !InteractiveObject.model.Walkable;
     }
 }
