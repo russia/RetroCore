@@ -1,2 +1,1 @@
-﻿Revoir le pathfinder, il utilise pas les diagonales (il faut ajouter ça dans le getwalkablecell), et le path n'est pas très propre
-get map coordonates pour créer le worldpathfinder
+﻿get map coordonates pour créer le worldpathfinder

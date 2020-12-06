@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RetroCore.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
     {
         private List<Cell> mapCellsWalkable = new List<Cell>();
         private Client Client;
-        private List<Cell> visitedTiles = new List<Cell>();
+        private List<Cell> visitedCells = new List<Cell>();
 
         public PathFinder(Client client)
         {
@@ -24,54 +25,57 @@ namespace RetroCore.Manager.MapManager.PathFinder
         {
             Update();
             Cell StartCell = Client.MapManager.CurrentCell;
-            Console.WriteLine("Start cellid : " + StartCell.Id);
+            StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
             Cell DestinationCell = Client.MapManager.GetCellById(cellId);
             List<Cell> Path = new List<Cell>();
-            StartCell.SetDistance(DestinationCell.x, DestinationCell.y);
+            StartCell.SetDistance(StartCell.get_Distance(DestinationCell));
 
-            var activeTiles = new List<Cell>();
-            activeTiles.Add(StartCell);
+            var activeCells = new List<Cell>();
+            activeCells.Add(StartCell);
 
-            while (activeTiles.Any())
+            while (activeCells.Any())
             {
-                var checkTile = activeTiles.OrderBy(x => x.CostDistance).First();
+                var checkCell = activeCells.OrderBy(x => x.CostDistance).First();
 
-                if (checkTile.x == DestinationCell.x && checkTile.y == DestinationCell.y)
+                if (checkCell.x == DestinationCell.x && checkCell.y == DestinationCell.y)
                 {
-                    Console.WriteLine("We are at the destination!");
-                    Cell tempCell = checkTile;
+                    StringHelper.WriteLine("We found a way !", ConsoleColor.Blue);
+                    Cell tempCell = checkCell;
 
                     while (true)
                     {
                         if (tempCell.Parent == null)
+                        {
+                            Path.Add(DestinationCell);
                             break;
+                        }                         
                         Path.Add(tempCell.Parent);
                         tempCell = tempCell.Parent;
                     }
                     return Path;
                 }
 
-                visitedTiles.Add(checkTile);
-                activeTiles.Remove(checkTile);
+                visitedCells.Add(checkCell);
+                activeCells.Remove(checkCell);
 
-                var walkableTiles = GetWalkableCells(checkTile, DestinationCell);
+                var walkableCells = GetWalkableCells(checkCell, DestinationCell);
 
-                foreach (var walkableTile in walkableTiles)
+                foreach (var walkablecell in walkableCells)
                 {
-                    if (visitedTiles.Any(x => x.x == walkableTile.x && x.y == walkableTile.y))
+                    if (visitedCells.Any(x => x.x == walkablecell.x && x.y == walkablecell.y))
                         continue;
 
-                    if (activeTiles.Any(x => x.x == walkableTile.x && x.y == walkableTile.y))
+                    if (activeCells.Any(x => x.x == walkablecell.x && x.y == walkablecell.y))
                     {
-                        var existingTile = activeTiles.First(x => x.x == walkableTile.x && x.y == walkableTile.y);
-                        if (existingTile.CostDistance > checkTile.CostDistance)
+                        var existingTile = activeCells.First(x => x.x == walkablecell.x && x.y == walkablecell.y);
+                        if (existingTile.CostDistance > checkCell.CostDistance)
                         {
-                            activeTiles.Remove(existingTile);
-                            activeTiles.Add(walkableTile);
+                            activeCells.Remove(existingTile);
+                            activeCells.Add(walkablecell);
                         }
                     }
                     else
-                        activeTiles.Add(walkableTile);
+                        activeCells.Add(walkablecell);
                 }
             }
 
@@ -79,19 +83,42 @@ namespace RetroCore.Manager.MapManager.PathFinder
             return null;
         }
 
+        public List<Cell> GetUnvisitedDiagonales(Cell currentCell)
+        {
+            List<Cell> OneCellsRadius = new List<Cell>();
+            OneCellsRadius = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
+            List<Cell> Result = new List<Cell>();
+            foreach (var cell in OneCellsRadius)
+            {
+                var list = mapCellsWalkable.Where(x => x.get_Distance(cell) == 1 && x.Id != currentCell.Id);
+                foreach (var neighbours in list)
+                    Result.Add(neighbours);
+            }
+            Result = Result.Where(x => Result.Where(y => y == x).Count() == 2).Distinct().ToList();
+
+            return Result;
+        }
+
+        public List<Cell> GetUnvisitedNeighbours(Cell currentCell)
+        {
+            List<Cell> OneCellsRadius = new List<Cell>();
+            OneCellsRadius = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
+            return OneCellsRadius;
+        }
+
         private List<Cell> GetWalkableCells(Cell currentCell, Cell targetCell)
         {
-            var possibleTiles = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedTiles.Contains(x)).ToList();
+            var possibleTiles = GetUnvisitedDiagonales(currentCell);
+            possibleTiles.AddRange(GetUnvisitedNeighbours(currentCell));
 
             foreach (var possibility in possibleTiles)
             {
                 possibility.Parent = currentCell;
                 possibility.Cost++;
             }
-            possibleTiles.ForEach(tile => tile.SetDistance(targetCell.x, targetCell.y));
+            possibleTiles.ForEach(tile => tile.SetDistance(1));
 
-            return possibleTiles
-                    .ToList();
+            return possibleTiles.ToList();
         }
     }
 }

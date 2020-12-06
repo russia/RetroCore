@@ -13,14 +13,11 @@ namespace RetroCore
         /*
         https://google.github.io/styleguide/csharp-style.html
          */
+        public static bool Debug;
 
         private static void Main(string[] args)
         {
-            if (!Debugger.IsAttached)
-            {
-                //
-            }
-
+            Debug = Debugger.IsAttached;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             StringHelper.WriteLine("Initializing..", ConsoleColor.Blue);
             DataManager.Initialize();

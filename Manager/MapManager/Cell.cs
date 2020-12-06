@@ -1,6 +1,7 @@
 ﻿using RetroCore.Manager.MapManager.Interactives;
 using RetroCore.Others;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RetroCore.Manager.MapManager
@@ -35,9 +36,9 @@ namespace RetroCore.Manager.MapManager
             //Cost = _cost;
         }
 
-        public void SetDistance(int targetX, int targetY)
+        public void SetDistance(int distance)
         {
-            this.Distance = Math.Abs(targetX - x) + Math.Abs(targetY - y);
+            this.Distance = 1;
         }
 
         #endregion
@@ -70,6 +71,7 @@ namespace RetroCore.Manager.MapManager
         }
 
         public int get_Distance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
+
 
         public bool get_IsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
 
