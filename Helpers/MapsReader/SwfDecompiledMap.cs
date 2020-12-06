@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace RetroCore.Helpers.MapsReader
+﻿namespace RetroCore.Helpers.MapsReader
 {
     public class SwfDecompiledMap
     {
@@ -13,18 +10,16 @@ namespace RetroCore.Helpers.MapsReader
         public string MapData { get; set; }
         public string DecypheredMapData { get; set; }
 
-        public SwfDecompiledMap() { }
-        
-        public SwfDecompiledMap(int id, int width,int height, string mapdata)
+        public SwfDecompiledMap()
+        {
+        }
+
+        public SwfDecompiledMap(int id, int width, int height, string mapdata)
         {
             this.Id = id;
             this.Width = width;
             this.Height = height;
             this.MapData = mapdata;
         }
-
-     
-
-
     }
 }

@@ -111,74 +111,13 @@ namespace RetroCore.Network.Frames.Game
 
             switch (actionId)
             {
-                case 0:
-                   
-                    break;
-
                 case 1:
                     cell = mapa.GetCellById(Hash.GetCellIdByHash(separador[3].Substring(separador[3].Length - 2)));
                     byte.TryParse(separador[0], out byte type_gkk);
 
                     if (entityId == client.CharacterId)
                         await client.AwaitMovementEnds(cell, type_gkk);
-                  
-                    break;
 
-                case 4:
-                   
-                    break;
-
-                case 5:
-               
-                    break;
-
-                case 100:
-                case 108:
-                case 110:
-                case 127:
-                case 129:
-                case 128:
-                case 78:
-                case 169:
-                case 101:
-                case 102:
-                case 111:
-                case 120:
-                case 168:
-                  
-                    break;
-
-                case 103:
-                    
-                    break;
-
-                case 151:
-                  
-                    break;
-
-                case 180:
-                case 181:
-                  
-                    break;
-
-                case 300:
-                   
-                    break;
-
-                case 302:
-                   
-                    break;
-
-                case 501:
-                  
-                    break;
-
-                case 900:
-                   
-                    break;
-
-                case 905:
-         
                     break;
             }
         });

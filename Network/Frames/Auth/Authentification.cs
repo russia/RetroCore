@@ -25,9 +25,8 @@ namespace RetroCore.Network.Frames.Auth
             await client.Network.SendPacket($"Ap{Constants.AuthPort}");
 
             await client.Network.SendPacket($"Ai{StringHelper.GetRandomNetworkKey()}");
-           
-            await client.Network.SendPacket("Ax");
 
+            await client.Network.SendPacket("Ax");
         });
 
         [PacketId("Af")]
@@ -41,14 +40,14 @@ namespace RetroCore.Network.Frames.Auth
         public void Inactivity(Client client, string packet)
         {
             packet = PacketsReceiver.GetPacketContent(packet);
-            StringHelper.WriteLine($"Disconnected for inactivity..",ConsoleColor.Red);
+            StringHelper.WriteLine($"Disconnected for inactivity..", ConsoleColor.Red);
         }
 
         [PacketId("AH")]
         public void GetServersStates(Client client, string packet)
         {
             string[] availableServersDatas = PacketsReceiver.GetPacketContent(packet).Substring(2).Split('|');
-            foreach(string servDatas in availableServersDatas)
+            foreach (string servDatas in availableServersDatas)
             {
                 string[] splitter = servDatas.Split(';');
                 int id = int.Parse(splitter[0]);
@@ -61,11 +60,13 @@ namespace RetroCore.Network.Frames.Auth
         {
             StringHelper.WriteLine($"[{client.Username}:{client.Password}] servers are in maintenance..", ConsoleColor.Yellow);
         }
+
         [PacketId("Ad")]
         public void AuthentificationNickname(Client client, string packet)
         {
             StringHelper.WriteLine($"[Auth] Account {client.Username} is connected !", ConsoleColor.Blue);
         }
+
         [PacketId("AlE")]
         public void AuthentificationFailed(Client client, string packet)
         {
@@ -79,8 +80,7 @@ namespace RetroCore.Network.Frames.Auth
             var rawPacket = PacketsReceiver.GetPacketContent(packet).Split('|').Distinct().ToList();
             DateTime subEndDate = StringHelper.UnixTimeStampToDateTime(long.Parse(rawPacket[0]));
             //StringHelper.WriteLine($"[{client.Username}:{client.Password}] is subscribed, end date : {subEndDate.Day}/{subEndDate.Month}/{subEndDate.Year}", ConsoleColor.Green);
-             await client.Network.SendPacket($"AX624");
-         
+            await client.Network.SendPacket($"AX624");
         });
 
         [PacketId("AXK")]
@@ -94,4 +94,3 @@ namespace RetroCore.Network.Frames.Auth
         }
     }
 }
-

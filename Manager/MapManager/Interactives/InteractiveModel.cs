@@ -52,7 +52,7 @@ namespace RetroCore.Manager.MapManager.Interactives
             return null;
         }
 
-        public static InteractiveModel get_Modelo_Por_Habilidad(short habilityId)
+        public static InteractiveModel getModelByHability(short habilityId)
         {
             IEnumerable<InteractiveModel> InteractivesList = LoadedInteractives.Where(i => i.Habilities != null);
 

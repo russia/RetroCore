@@ -2,6 +2,7 @@
 using RetroCore.Manager.MapManager;
 using RetroCore.Manager.MapManager.PathFinder;
 using RetroCore.Network;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RetroCore
@@ -47,12 +48,13 @@ namespace RetroCore
             MapManager.CurrentCell = destination;
 
             MapManager.ActualPath = null;
+            OnCharacterConnectionFinished();
         }
 
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(800); //todo find an other packet
-            var path = PathFinderManager.GetPath(450);
+            var path = PathFinderManager.GetPath(MapManager.Cells.First(x => x.is_Interactive_Walkable() == true).Id);
             path.Reverse();
             string packetContent = "GA001" + Hash.getHashedPath(path);
             await this.Network.SendPacket(packetContent);

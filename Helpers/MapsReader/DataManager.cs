@@ -95,6 +95,7 @@ namespace RetroCore.Helpers.MapsReader
             map.DecypheredMapData = DecypherData(map.MapData, map_key);
             return map;
         }
+
         //public static SwfDecompiledMap ReadSwfLang(string path)
         //{
         //    var map = new SwfDecompiledMap();
@@ -117,8 +118,7 @@ namespace RetroCore.Helpers.MapsReader
         //                foreach (BaseAction obj in actions)
         //                    sb += obj.ToString();
         //            }
-           
-                    
+
         //            Console.WriteLine("1");
         //        }
         //    }
@@ -152,7 +152,6 @@ namespace RetroCore.Helpers.MapsReader
                     map.Id = int.Parse(Gettok(Gettok(sb, "push", 9), " ", 2));
                     map.Width = int.Parse(Gettok(Gettok(sb, "push", 11), " ", 2)); //x
                     map.Height = int.Parse(Gettok(Gettok(sb, "push", 13), " ", 2)); // y
-                   
                 }
             }
             Reader.Close();

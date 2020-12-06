@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RetroCore.Others
+﻿namespace RetroCore.Others
 {
     public enum ServerStatus
     {
@@ -12,6 +6,7 @@ namespace RetroCore.Others
         ON,
         SAVING
     }
+
     public enum CellsType
     {
         NOT_WALKABLE = 0,
@@ -23,6 +18,7 @@ namespace RetroCore.Others
         PATH1 = 6,
         PATH2 = 7
     }
+
     internal enum AnimationType
     {
         MOUNT,

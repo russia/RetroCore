@@ -45,7 +45,7 @@ namespace RetroCore.Network.Dispatcher
             {
                 if (Program.Debug)
                     StringHelper.WriteLine($"X Received unknowed packet -> [{packet}]", ConsoleColor.Yellow);
-                
+
                 return;
             }
             if (methods.Count > 1)
@@ -57,7 +57,7 @@ namespace RetroCore.Network.Dispatcher
             {
                 methods.First().Methode.Invoke(methods.First().Instance, new object[] { client, packet });
             }
-            catch 
+            catch
             {
                 if (client.Network.isDisposed)
                     return;
@@ -68,9 +68,9 @@ namespace RetroCore.Network.Dispatcher
         public static string GetPacketName(string packet)
         {
             List<PacketData> methods = Methods.FindAll(m => packet.StartsWith(m.Name)); //we should NEVER have more than 1 packet
-            if (!methods.Any())            
-               return "";
-            
+            if (!methods.Any())
+                return "";
+
             if (methods.Count > 1)
             {
                 StringHelper.WriteLine($"X This packet is registered {methods.Count()} times ! -> [{packet}]", ConsoleColor.DarkRed);
@@ -78,6 +78,7 @@ namespace RetroCore.Network.Dispatcher
             }
             return methods.First().Name;
         }
+
         public static string GetPacketContent(string packet)
         {
             List<PacketData> methods = Methods.FindAll(m => packet.StartsWith(m.Name)); //we should NEVER have more than 1 packet

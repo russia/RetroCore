@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RetroCore.Helpers
+﻿namespace RetroCore.Helpers
 {
     public class Constants
     {
@@ -14,6 +7,5 @@ namespace RetroCore.Helpers
         public static string GameVersion = "1.33.6";
         public static string MapsPath;
         public static string LangsPath;
-
     }
 }
