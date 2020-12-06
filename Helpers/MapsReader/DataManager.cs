@@ -1,18 +1,23 @@
-﻿using SwfDotNet.IO;
+﻿using RetroCore.Helpers.MapsReader.Types;
+using SwfDotNet.IO;
 using SwfDotNet.IO.ByteCode;
 using SwfDotNet.IO.ByteCode.Actions;
 using SwfDotNet.IO.Tags;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace RetroCore.Helpers.MapsReader
 {
     public static class DataManager
     {
+        public static List<MapCoordinates> GlobalMapsInfos = new List<MapCoordinates>();
+
         private static bool GamePathFound = false;
         private static string LangsVersion = "";
         private static string[] RequiredLangs = { "maps" };
@@ -22,6 +27,7 @@ namespace RetroCore.Helpers.MapsReader
             GamePathFound = Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Ankama\\zaap\\retro\\resources\\app\\retroclient\\data");
             InitializeMaps();
             InitializeLangs();
+            ReadSwfLang($"{Constants.LangsPath}\\{RequiredLangs[0]}_fr_{LangsVersion}.swf"); //on trouvera bien une utilité à RequiredLangs
         }
 
         public static void InitializeMaps()
@@ -48,7 +54,7 @@ namespace RetroCore.Helpers.MapsReader
             var responseString = web.DownloadString(url);
             string[] splitted = responseString.Replace("&f=", "").Split('|');
             LangsVersion = splitted[0].Split(',')[2];
-            Constants.LangsPath = AppDomain.CurrentDomain.BaseDirectory + "\\langs";
+            Constants.LangsPath = AppDomain.CurrentDomain.BaseDirectory + "langs";
             if (!Directory.Exists($"{Constants.LangsPath}\\"))
                 Directory.CreateDirectory($"{Constants.LangsPath}\\");
             string[] Files = Directory.GetFiles(Constants.LangsPath, "*.swf", SearchOption.TopDirectoryOnly);
@@ -90,42 +96,51 @@ namespace RetroCore.Helpers.MapsReader
                 DownloadMap(id, mapid);
             }
             SwfDecompiledMap map = ReadSwfMap((Constants.MapsPath + $"\\{id}" + "_" + $"{mapid}X.swf"));
-            //TODO read map lang file here to get x,y coords values
-            //ReadSwfLang($"{Constants.LangsPath}\\maps_fr_{LangsVersion}.swf");
+            map.XValue = GlobalMapsInfos.First(x => x.MapId == map.Id).xPos;
+            map.YValue = GlobalMapsInfos.First(x => x.MapId == map.Id).yPos; // handle si la map est pas stockée ??
             map.DecypheredMapData = DecypherData(map.MapData, map_key);
             return map;
         }
 
-        //public static SwfDecompiledMap ReadSwfLang(string path)
-        //{
-        //    var map = new SwfDecompiledMap();
-        //    SwfReader Reader = new SwfReader(path);
-        //    Swf swf = Reader.ReadSwf();
+        public static void ReadSwfLang(string path)
+        {
+            //This part is dirty but there arent so much ressources about how to decompile langs, decompilation & reading takes 12 secondes
+            StringHelper.WriteLine($"[DataManager] Reading maps lang ..", ConsoleColor.Cyan);
+            SwfReader Reader = new SwfReader(path);
+            Swf swf = Reader.ReadSwf();
 
-        //    IEnumerator enumerator = swf.Tags.GetEnumerator();
-        //    while (enumerator.MoveNext())
-        //    {
-        //        BaseTag current = (BaseTag)enumerator.Current;
-        //        if (current.ActionRecCount != 0)
-        //        {
-        //            string sb = "";
-        //            IEnumerator currentenumerator = current.GetEnumerator();
-        //            while (currentenumerator.MoveNext())
-        //            {
-        //                Decompiler decompiler = new Decompiler(swf.Version);
-        //                ArrayList actions = decompiler.Decompile((byte[])currentenumerator.Current);
+            IEnumerator enumerator = swf.Tags.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                BaseTag current = (BaseTag)enumerator.Current;
+                if (current.ActionRecCount != 0)
+                {
+                    string sb = "";
+                    IEnumerator currentenumerator = current.GetEnumerator();
+                    while (currentenumerator.MoveNext())
+                    {
+                        Decompiler decompiler = new Decompiler(swf.Version);
+                        ArrayList actions = decompiler.Decompile((byte[])currentenumerator.Current);
 
-        //                foreach (BaseAction obj in actions)
-        //                    sb += obj.ToString();
-        //            }
+                        foreach (BaseAction obj in actions)
+                        {
+                            sb += obj.ToString();
+                        }
+                    }
 
-        //            Console.WriteLine("1");
-        //        }
-        //    }
-        //    Reader.Close();
-        //    swf = null;
-        //    return map;
-        //}
+                    var regex = @"getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push";
+                    var matches = Regex.Matches(sb, regex);
+
+                    foreach (Match match in matches)
+                        GlobalMapsInfos.Add(new MapCoordinates(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[5].Value)));
+                }
+            }
+
+            Reader.Close();
+            swf = null;
+            StringHelper.WriteLine($"[DataManager] {GlobalMapsInfos.Count()} maps added to list !", ConsoleColor.Cyan);
+        }
+
         public static SwfDecompiledMap ReadSwfMap(string path)
         {
             var map = new SwfDecompiledMap();
@@ -159,7 +174,7 @@ namespace RetroCore.Helpers.MapsReader
             return map;
         }
 
-        public static string Gettok(string GettokText, string GettokStr, int GettokNum)
+        public static string Gettok(string GettokText, string GettokStr, int GettokNum) //maxoubot
         {
             string[] GettokTmp;
 

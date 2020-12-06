@@ -12,6 +12,7 @@ namespace RetroCore
     {
         /*
         https://google.github.io/styleguide/csharp-style.html
+        https://cdn.discordapp.com/attachments/309032714982522881/752115574808510564/Diagramme_des_packets_Dofus.png
          */
         public static bool Debug;
 

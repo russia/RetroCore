@@ -38,7 +38,7 @@ namespace RetroCore.Manager.MapManager
 
         public void SetDistance(int distance)
         {
-            this.Distance = 1;
+            this.Distance = distance;
         }
 
         #endregion pathfinder
@@ -97,6 +97,6 @@ namespace RetroCore.Manager.MapManager
 
         public bool is_Walkable() => Active && Type != CellsType.NOT_WALKABLE && !is_Interactive_Walkable();
 
-        public bool is_Interactive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && !InteractiveObject.model.Walkable;
+        public bool is_Interactive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && InteractiveObject.model != null && !InteractiveObject.model.Walkable;
     }
 }

@@ -5,7 +5,6 @@ using RetroCore.Others;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace RetroCore.Manager.MapManager
@@ -16,8 +15,8 @@ namespace RetroCore.Manager.MapManager
         public byte Width { get; set; }
         public byte Height { get; set; }
         public Client _client { get; set; }
-        public sbyte x { get; set; }
-        public sbyte y { get; set; }
+        public int xCoord { get; set; }
+        public int yCoord { get; set; }
         public bool Map_updated { get; private set; }
 
         public Cell CurrentCell { get; set; }
@@ -47,6 +46,7 @@ namespace RetroCore.Manager.MapManager
             Map_updated = false;
             Task.Factory.StartNew(() =>
             {
+                Cells = null;
                 Entities.Clear();
                 Interactives.Clear();
                 string[] splitted = packet.Split('|');
@@ -54,6 +54,8 @@ namespace RetroCore.Manager.MapManager
                 Id = (short)map.Id;
                 Width = byte.Parse(map.Width.ToString());
                 Height = byte.Parse(map.Height.ToString());
+                xCoord = map.XValue;
+                yCoord = map.YValue;
                 DecompressMap(map.DecypheredMapData);
                 Map_updated = true;
             });

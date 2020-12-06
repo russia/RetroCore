@@ -35,7 +35,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
             Cell DestinationCell = Client.MapManager.GetCellById(cellId);
             StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
             StringHelper.WriteLine("Destination cellid: " + DestinationCell.Id, ConsoleColor.Blue);
-           
+
             List<Cell> Path = new List<Cell>();
             StartCell.SetDistance(StartCell.get_Distance(DestinationCell));
 
@@ -55,10 +55,9 @@ namespace RetroCore.Manager.MapManager.PathFinder
                     {
                         if (tempCell.Parent == null)
                             break;
-                     
-                            Path.Add(tempCell.Parent);
-                            tempCell = tempCell.Parent;
-                        
+
+                        Path.Add(tempCell.Parent);
+                        tempCell = tempCell.Parent;
                     }
                     Path.Reverse();
                     Path.Add(DestinationCell);
@@ -106,7 +105,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
                     Result.Add(neighbours);
             }
             Result = Result.Where(x => Result.Where(y => y == x).Count() == 2).Distinct().ToList();
-
+            // Result.ForEach(tile => tile.SetDistance(1));
             return Result;
         }
 
@@ -114,6 +113,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
         {
             List<Cell> OneCellsRadius = new List<Cell>();
             OneCellsRadius = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
+            //OneCellsRadius.ForEach(tile => tile.SetDistance(2));  // diagonales are way better than straight lines
             return OneCellsRadius;
         }
 
@@ -122,12 +122,13 @@ namespace RetroCore.Manager.MapManager.PathFinder
             var possibleTiles = GetUnvisitedDiagonales(currentCell);
             possibleTiles.AddRange(GetUnvisitedNeighbours(currentCell));
 
+            possibleTiles.ForEach(tile => tile.SetDistance(1));
+
             foreach (var possibility in possibleTiles)
             {
                 possibility.Parent = currentCell;
                 possibility.Cost++;
             }
-            possibleTiles.ForEach(tile => tile.SetDistance(1));
 
             return possibleTiles.ToList();
         }
