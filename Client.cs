@@ -55,14 +55,15 @@ namespace RetroCore
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(800); //todo find an other packet
-            var path = PathFinderManager.GetPath(MapManager.Cells.First(x => x.is_Teleporter() == true).Id);
-            foreach(var cell in path)
+            var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.is_Teleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
+       
+            foreach (var cell in path)
             {
                 Console.Write(cell.Id + " -> ");
-            } 
+            }
 
-            //string packetContent = "GA001" + Hash.getHashedPath(path);
-            //await this.Network.SendPacket(packetContent);
+            string packetContent = "GA001" + Hash.getHashedPath(path);
+            await this.Network.SendPacket(packetContent);
         });
 
         #endregion Events

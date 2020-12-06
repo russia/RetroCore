@@ -17,8 +17,11 @@ namespace RetroCore.Manager.MapManager.PathFinder
             Client = client;
         }
 
-        public void Update()
+        public void Refresh()
         {
+            mapCellsWalkable.Clear();
+            visitedCells.Clear();
+
             while (!Client.MapManager.Map_updated)
                 Thread.Sleep(500);
             mapCellsWalkable = Client.MapManager.Cells.Where(x => x.is_Walkable() == true).ToList();
@@ -26,11 +29,13 @@ namespace RetroCore.Manager.MapManager.PathFinder
 
         public List<Cell> GetPath(short cellId)
         {
-            Update();
+            Refresh();
 
             Cell StartCell = Client.MapManager.CurrentCell;
-            StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
             Cell DestinationCell = Client.MapManager.GetCellById(cellId);
+            StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
+            StringHelper.WriteLine("Destination cellid: " + DestinationCell.Id, ConsoleColor.Blue);
+           
             List<Cell> Path = new List<Cell>();
             StartCell.SetDistance(StartCell.get_Distance(DestinationCell));
 
@@ -85,7 +90,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
                 }
             }
 
-            Console.WriteLine("No Path Found!");
+            Console.WriteLine("No Path Found, retrying!");
             return null;
         }
 

@@ -44,6 +44,7 @@ namespace RetroCore.Manager.MapManager
 
         public void UpdateMapData(string packet)
         {
+            Map_updated = false;
             Task.Factory.StartNew(() =>
             {
                 Entities.Clear();
