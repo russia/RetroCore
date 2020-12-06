@@ -49,13 +49,14 @@ namespace RetroCore.Manager.MapManager.PathFinder
                     while (true)
                     {
                         if (tempCell.Parent == null)
-                        {
-                            Path.Add(DestinationCell);
                             break;
-                        }
-                        Path.Add(tempCell.Parent);
-                        tempCell = tempCell.Parent;
+                     
+                            Path.Add(tempCell.Parent);
+                            tempCell = tempCell.Parent;
+                        
                     }
+                    Path.Reverse();
+                    Path.Add(DestinationCell);
                     Client.MapManager.ActualPath = Path;
                     return Path;
                 }
