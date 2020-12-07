@@ -108,7 +108,6 @@ namespace RetroCore.Helpers.MapsReader
             StringHelper.WriteLine($"[DataManager] Reading maps lang ..", ConsoleColor.Cyan);
             SwfReader Reader = new SwfReader(path);
             Swf swf = Reader.ReadSwf();
-
             IEnumerator enumerator = swf.Tags.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -126,23 +125,33 @@ namespace RetroCore.Helpers.MapsReader
                         {
                             sb += obj.ToString();
                         }
-                    }
 
-                    var regex = @"getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push";
-                    var matches = Regex.Matches(sb, regex);
-
-                    foreach (Match match in matches) {
-                        GlobalMapsInfos.Add(new MapCoordinates(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[5].Value)));
-                        Console.Write("\r{0} maps..", GlobalMapsInfos.Count()); 
+                        //maps coords & subarea id
+                        var regex = @"getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int push (-?[0-9]*?) as var push (-?[0-9]*?) as int";
+                        var matches = Regex.Matches(sb, regex);
+                        foreach (Match match in matches)
+                        {
+                            GlobalMapsInfos.Add(new MapCoordinates(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[5].Value), int.Parse(match.Groups[7].Value)));
+                        }
+                        //area id
+                        foreach (var map in GlobalMapsInfos.Where(x => x.AreaId == -1))
+                        {
+                            var regex2 = @"getMemberpush " + map.SubAreaId + " as int push (-?[0-9]*?) as var push (-?[0-9]*?) as var push (-?[0-9]*?) as var push (-?[0-9]*?) ";
+                            var matches2 = Regex.Matches(sb, regex2);
+                            foreach (Match match2 in matches2)
+                                map.AreaId = int.Parse(match2.Groups[4].Value);
+                        }
+                        Console.Write("\r{0} maps..", GlobalMapsInfos.Count());
+                        sb = "";
                     }
-                        
                 }
             }
 
             Reader.Close();
             swf = null;
-            Console.WriteLine("\n");
+            Console.Write("\n");
             StringHelper.WriteLine($"[DataManager] {GlobalMapsInfos.Count()} maps added to list !", ConsoleColor.Cyan);
+            StringHelper.WriteLine("[DataManager] Map without undefinied AreaId : " + GlobalMapsInfos.Count(x => x.AreaId == -1), ConsoleColor.Cyan);
         }
 
         public static SwfDecompiledMap ReadSwfMap(string path)

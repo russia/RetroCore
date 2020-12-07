@@ -54,7 +54,6 @@ namespace RetroCore
         {
             await Task.Delay(3500); //todo find an other packet
 
-            Console.WriteLine($"Current map Coords : {MapManager.xCoord},{MapManager.yCoord}");
             //var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.is_Teleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
             //var path = PathFinderManager.GetPath(26);
 

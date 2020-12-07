@@ -58,7 +58,8 @@ namespace RetroCore.Manager.MapManager
                 yCoord = map.YValue;
                 DecompressMap(map.DecypheredMapData);
                 Map_updated = true;
-            });
+                StringHelper.WriteLine($"Current map Coords : [{_client.MapManager.xCoord},{_client.MapManager.yCoord}]", ConsoleColor.Green);
+            });            
         }
 
         #endregion updates

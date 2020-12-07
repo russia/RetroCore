@@ -89,7 +89,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
                 }
             }
 
-            Console.WriteLine("No Path Found, retrying!");
+            Console.WriteLine("No Path Found!");
             return null;
         }
 
