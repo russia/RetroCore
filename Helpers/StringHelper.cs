@@ -17,6 +17,15 @@ namespace RetroCore.Helpers
             Console.WriteLine(DateTime.Now.ToString("[HH:mm:ss:fff] ") + msg);
         }
 
+        public static string UppercaseFirst(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return string.Empty;
+            }
+            return char.ToUpper(s[0]) + s.Substring(1);
+        }
+
         public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch

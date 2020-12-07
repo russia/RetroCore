@@ -1,7 +1,7 @@
 ﻿using RetroCore.Manager.MapManager;
 using RetroCore.Manager.MapManager.PathFinder;
+using RetroCore.Manager.MapManager.WorldPathFinder;
 using RetroCore.Network;
-using System;
 using System.Threading.Tasks;
 
 namespace RetroCore
@@ -25,6 +25,7 @@ namespace RetroCore
 
         public Map MapManager;
         public PathFinder PathFinderManager;
+        public WorldPathFinder WorldPathFinderManager;
 
         #endregion Managers
 
@@ -35,6 +36,7 @@ namespace RetroCore
             Network = new SocketClient(this);
             MapManager = new Map(this);
             PathFinderManager = new PathFinder(this);
+            WorldPathFinderManager = new WorldPathFinder(this);
         }
 
         #region Events
@@ -53,7 +55,7 @@ namespace RetroCore
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(3500); //todo find an other packet
-
+            WorldPathFinderManager.GetPath(MapManager.xCoord, MapManager.yCoord);
             //var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.is_Teleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
             //var path = PathFinderManager.GetPath(26);
 

@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.12" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ProxySocket" Version="1.1.2" />
     <PackageReference Include="SwfDotNet.IO" Version="1.0.0.1" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

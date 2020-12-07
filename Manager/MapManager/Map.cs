@@ -5,6 +5,7 @@ using RetroCore.Others;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RetroCore.Manager.MapManager
@@ -58,8 +59,9 @@ namespace RetroCore.Manager.MapManager
                 yCoord = map.YValue;
                 DecompressMap(map.DecypheredMapData);
                 Map_updated = true;
-                StringHelper.WriteLine($"Current map Coords : [{_client.MapManager.xCoord},{_client.MapManager.yCoord}]", ConsoleColor.Green);
-            });            
+                StringHelper.WriteLine($"Current map Coords : [{_client.MapManager.xCoord},{_client.MapManager.yCoord} Area [{DataManager.GlobalMapsInfos.First(x => x.MapId == Id).AreaId}] - SubArea [{DataManager.GlobalMapsInfos.First(x => x.MapId == Id).SubAreaId}]]", ConsoleColor.Green);
+                StringHelper.WriteLine($"Current size : [{_client.MapManager.Width},{_client.MapManager.Height}]", ConsoleColor.Green);
+            });
         }
 
         #endregion updates

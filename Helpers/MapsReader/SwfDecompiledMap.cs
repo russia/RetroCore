@@ -3,6 +3,7 @@
     public class SwfDecompiledMap
     {
         public int Id { get; set; }
+        public bool OutDoor { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int XValue { get; set; }

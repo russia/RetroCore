@@ -1,1 +1,4 @@
-﻿get map coordonates pour créer le worldpathfinder
+﻿revoir les objets swfdecompiler et mapdatas, pour en faire un seul
+revoir la décompilation des maps (trop longue mal opti)
+refaire le code du world path finder
+trouver un moyen de get les cellid des maps sans la mapkey et sans les avoir sur le pc
