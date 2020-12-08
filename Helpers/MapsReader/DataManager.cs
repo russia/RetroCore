@@ -188,7 +188,8 @@ namespace RetroCore.Helpers.MapsReader
                         var content = ParseSwfMapDatas(sb);
                         content.DecypheredMapData = Hash.DecypherData(content.CypheredMapData, MapKeyCracker.MapCrackKey(content.CypheredMapData));
                         GlobalMapsInfos.First(x => x.Id == content.Id).SwfDatas.MapId = path.Substring(path.IndexOf(id) + id.Length+1, path.IndexOf(".swf") - (path.IndexOf(id) + id.Length + 1));
-                        MapList.Add(GlobalMapsInfos.First(x => x.Id == content.Id));
+                        GlobalMapsInfos.First(x => x.Id == content.Id).SwfDatas = content;
+                        MapList.Add(GlobalMapsInfos.First(x => x.SwfDatas == content));
                         sb = "";
                     }
                 }

@@ -32,11 +32,11 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
             MapDatas = map;
             //Getting map infos
-            //Id = (short)map.Id;
-            //Width = byte.Parse(map.SwfDatas.Width.ToString());
-            //Height = byte.Parse(map.SwfDatas.Height.ToString());
-            //xCoord = map.xPos;
-            //yCoord = map.yPos;
+            Id = (short)map.Id;
+            Width = byte.Parse(map.SwfDatas.Width.ToString());
+            Height = byte.Parse(map.SwfDatas.Height.ToString());
+            xCoord = map.xPos;
+            yCoord = map.yPos;
             DecompressMap(map.SwfDatas.DecypheredMapData);
         }
 

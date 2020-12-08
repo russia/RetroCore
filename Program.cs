@@ -1,5 +1,6 @@
 ﻿using RetroCore.Helpers;
 using RetroCore.Helpers.MapsReader;
+using RetroCore.Manager.MapManager.WorldPathFinder;
 using RetroCore.Network.Dispatcher;
 using System;
 using System.Diagnostics;
