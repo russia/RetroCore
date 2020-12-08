@@ -14,6 +14,7 @@ namespace RetroCore
         /*
         https://google.github.io/styleguide/csharp-style.html
         https://cdn.discordapp.com/attachments/309032714982522881/752115574808510564/Diagramme_des_packets_Dofus.png
+        https://funky-emu.net/uploads/monthly_2011_11/59fb3340d8092_MAPIDCELL.jpg.218d7f76b1bd94e4b499244d335c961f.jpg
          */
         public static bool Debug;
 
@@ -26,7 +27,7 @@ namespace RetroCore
             DataManager.Initialize();
             MapKeyCracker.Initialize();
             PacketsReceiver.Initialize();
-            StringHelper.WriteLine("Initialization done, starting..", ConsoleColor.Magenta);
+            StringHelper.WriteLine("Initialization done, starting..", ConsoleColor.Gray);
 
             Client bot1 = null;
             var task = Task.Factory.StartNew(() => { bot1 = new Client("msaliraso1", "sfn198622"); });
@@ -34,7 +35,7 @@ namespace RetroCore
             //mrchriistoo77: EliasetMathieu77
             while (true)
             {
-                Thread.Sleep(300);
+                Thread.Sleep(100);
             }
         }
     }

@@ -1,6 +1,8 @@
 ﻿using RetroCore.Helpers;
 using RetroCore.Helpers.MapsReader;
 using RetroCore.Helpers.MapsReader.Types;
+using RetroCore.Manager.MapManager.WorldPathFinder.Helper;
+using RetroCore.Others;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,113 +29,45 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
         public void GetPath(int _x, int _y)
         {
             while (!_client.MapManager.Map_updated)
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             if (!isEnabled)
             {
                 StringHelper.WriteLine("[WorldPathFinder] Sorry WorldPathFinder is only available if Dofus Retro is installed.", ConsoleColor.Yellow);
                 return;
             }
 
-            var list = DataManager.GlobalMapsInfos.Where(x => x.xPos == _x && x.yPos == _y && x.SubAreaId == DataManager.GlobalMapsInfos.First(y => y.Id == _client.MapManager.Id).SubAreaId);
-            foreach (var map in list)
-                StringHelper.WriteLine($"{_x},{_y} mapId - [{map.Id}]", ConsoleColor.Yellow);
+            MapDatas currentMapInfo = DataManager.GlobalMapsInfos.First(x => x.xPos == _x && x.yPos == _y && x.SubAreaId == DataManager.GlobalMapsInfos.First(y => y.Id == _client.MapManager.Id).SubAreaId);
+            StringHelper.WriteLine($"{_x},{_y} mapId - [{currentMapInfo.Id}]", ConsoleColor.Yellow);
 
-            GetNeighboursMaps();
+            
+            GetNeighboursMaps(DirectionType.BOTTOM);
+            GetNeighboursMaps(DirectionType.TOP);
+            GetNeighboursMaps(DirectionType.LEFT);
+            GetNeighboursMaps(DirectionType.RIGHT);
         }
 
         private List<MapObj> GetMapDatas(int id)
         {
             List<MapDatas> mapSwfContent = DataManager.ReadListSwfMap(id.ToString());
             List<MapObj> result = new List<MapObj>();
-            foreach (var mapContent in mapSwfContent)
-            {
-                // if(mapContent.SubAreaId == DataManager.GlobalMapsInfos.First(x => x.Id == currentMap.Id).SubAreaId)
-                //var data = DataManager.GlobalMapsInfos.First(x => x == mapContent);
+            foreach (MapDatas mapContent in mapSwfContent)
                 result.Add(new MapObj(mapContent));
-            }
             return result;
         }
 
-        private void GetNeighboursMaps()
+        private void GetNeighboursMaps(DirectionType Type)
         {
-            //TOP -> x ,y-1
+            Coordinates wantedCoords = Directions.GetCoordsByDirection(currentMap, Type);
+            List<MapDatas> mapsList = DataManager.GlobalMapsInfos.Where(x => x.xPos == wantedCoords._x && x.yPos == wantedCoords._y).ToList();
+            List<MapObj> finalMapList = new List<MapObj>();
+            foreach (var map in mapsList)
+                finalMapList.AddRange(GetMapDatas(map.Id));
+            List<MapObj> outDoorList = finalMapList.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
 
-            int wantedx = currentMap.xCoord;
-            int wantedy = currentMap.yCoord - 1;
-            List<MapDatas> Top = DataManager.GlobalMapsInfos.Where(x => x.xPos == wantedx && x.yPos == wantedy).ToList();
-            var FinalListTop = new List<MapObj>();
-            foreach (var map in Top) //getting maps data by reading swf files
-                FinalListTop.AddRange(GetMapDatas(map.Id));
-
-            var listTop = FinalListTop.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
-
-            foreach (var map in listTop)
+            foreach (var map in outDoorList)
             {
-                Console.WriteLine($"Top map id {map.Id} | cells : {map.Cells.Count()} | teleporter {map.Cells.Count(x => x.is_Teleporter())}");
+                StringHelper.WriteLine($"{Type.ToString()} map id {map.Id} | cells : {map.Cells.Count()} | teleporter {map.Cells.Count(x => x.is_Teleporter())}",ConsoleColor.Red);
             }
-
-            //BOTTOM -> x, y+1
-
-            wantedx = currentMap.xCoord;
-            wantedy = currentMap.yCoord + 1;
-            List<MapDatas> Bottom = DataManager.GlobalMapsInfos.Where(x => x.xPos == wantedx && x.yPos == wantedy).ToList();
-            var FinalListBottom = new List<MapObj>();
-            foreach (var map in Bottom) //getting maps data by reading swf files
-                FinalListBottom.AddRange(GetMapDatas(map.Id));
-
-            var listBottom = FinalListBottom.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
-
-            foreach (var map in listBottom)
-            {
-                Console.WriteLine($"Bottom map id {map.Id} | cells : {map.Cells.Count()} | teleporter {map.Cells.Count(x => x.is_Teleporter())}");
-            }
-
-            //LEFT -> x-1 ,y
-
-            wantedx = currentMap.xCoord - 1;
-            wantedy = currentMap.yCoord;
-            List<MapDatas> Left = DataManager.GlobalMapsInfos.Where(x => x.xPos == wantedx && x.yPos == wantedy).ToList();
-            var FinalListLeft = new List<MapObj>();
-            foreach (var map in Left) //getting maps data by reading swf files
-                FinalListLeft.AddRange(GetMapDatas(map.Id));
-
-            var listLeft = FinalListLeft.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
-
-            foreach (var map in listLeft)
-            {
-                Console.WriteLine($"Left map id {map.Id} | cells : {map.Cells.Count()} | teleporter {map.Cells.Count(x => x.is_Teleporter())}");
-            }
-
-            //RIGHT -> x+1, y
-
-            wantedx = currentMap.xCoord + 1;
-            wantedy = currentMap.yCoord;
-            List<MapDatas> Right = DataManager.GlobalMapsInfos.Where(x => x.xPos == wantedx && x.yPos == wantedy).ToList();
-            var FinalListRight = new List<MapObj>();
-            foreach (var map in Right) //getting maps data by reading swf files
-                FinalListRight.AddRange(GetMapDatas(map.Id));
-
-            var listRight = FinalListRight.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
-
-            foreach (var map in listRight)
-            {
-                Console.WriteLine($"Right map id {map.Id} | cells : {map.Cells.Count()} | teleporter {map.Cells.Count(x => x.is_Teleporter())}");
-            }
-        }
-
-        public static bool GetSwfContent(string id) // il peut y avoir plusieurs id de map identiques ..
-        {
-            //List<MapDatas> MapData = DataManager.ReadListSwfMap(id);
-            //foreach (var map in MapData)
-            //{
-            //    var list = DataManager.GlobalMapsInfos.Where(x => x.Id == map.Id);
-            //    if (list.Count() != 1) //faudra trier ici par Subarea ..
-            //        return false;
-
-            //    var obj = list.First();
-            //    obj.OutDoor = map.OutDoor;
-            //}
-            return true;
         }
     }
 }

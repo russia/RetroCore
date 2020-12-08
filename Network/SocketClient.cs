@@ -78,19 +78,19 @@ namespace RetroCore.Network
                 {
                     var data = Encoding.UTF8.GetString(this.Buffer, 0, bytesReceived);
 
-                    if (Program.Debug)
-                    {
-                        string finalStr = "";
-                        foreach (var value in this.Buffer)
-                        {
-                            if (value == 0)
-                            {
-                                StringHelper.WriteLine(finalStr, ConsoleColor.Gray);
-                                break;
-                            }
-                            finalStr += value + " ";
-                        }
-                    }
+                    //if (Program.Debug)
+                    //{
+                    //    string finalStr = "";
+                    //    foreach (var value in this.Buffer)
+                    //    {
+                    //        if (value == 0)
+                    //        {
+                    //            StringHelper.WriteLine(finalStr, ConsoleColor.Gray);
+                    //            break;
+                    //        }
+                    //        finalStr += value + " ";
+                    //    }
+                    //}
                     Ping.Update();
 
                     foreach (var packet in data.Replace("\x0a", string.Empty).Split('\x00').Where(x => x != ""))

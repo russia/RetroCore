@@ -26,4 +26,12 @@
         WALKING,
         PHANTOM
     }
+
+    public enum DirectionType
+    {
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
+    }
 }

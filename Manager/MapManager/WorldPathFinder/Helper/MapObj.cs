@@ -6,7 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace RetroCore.Manager.MapManager.WorldPathFinder
+namespace RetroCore.Manager.MapManager.WorldPathFinder.Helper
 {
     public class MapObj : IDisposable
     {

@@ -1,5 +1,5 @@
 ﻿using RetroCore.Manager.MapManager.Interactives;
-using RetroCore.Manager.MapManager.WorldPathFinder;
+using RetroCore.Manager.MapManager.WorldPathFinder.Helper;
 using RetroCore.Others;
 using System;
 using System.Linq;
@@ -28,14 +28,6 @@ namespace RetroCore.Manager.MapManager
         public Cell Parent { get; set; } = null;
 
         public static readonly int[] teleportTextures = { 1030, 1029, 4088 };
-
-        public Cell()//(int _x, int _y, Cell parent, int _cost)
-        {
-            //x = _x;
-            //y = _y;
-            //Parent = parent;
-            //Cost = _cost;
-        }
 
         public void SetDistance(int distance)
         {
@@ -70,6 +62,7 @@ namespace RetroCore.Manager.MapManager
             y = _calcul1 - _calcul3;
             x = (Id - ((Width - 1) * y)) / Width;
         }
+
         public Cell(short _id, bool active, CellsType _type, bool _isLinear, byte _level, byte _slope, short _interactiveObjId, short _layer_object_1_num, short _layer_object_2_num, MapObj _map)
         {
             Id = _id;
@@ -96,6 +89,7 @@ namespace RetroCore.Manager.MapManager
             y = _calcul1 - _calcul3;
             x = (Id - ((Width - 1) * y)) / Width;
         }
+
         public int get_Distance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
 
         public bool get_IsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
