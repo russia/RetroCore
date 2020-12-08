@@ -1,4 +1,5 @@
 ﻿using RetroCore.Manager.MapManager.Interactives;
+using RetroCore.Manager.MapManager.WorldPathFinder;
 using RetroCore.Others;
 using System;
 using System.Linq;
@@ -69,7 +70,32 @@ namespace RetroCore.Manager.MapManager
             y = _calcul1 - _calcul3;
             x = (Id - ((Width - 1) * y)) / Width;
         }
+        public Cell(short _id, bool active, CellsType _type, bool _isLinear, byte _level, byte _slope, short _interactiveObjId, short _layer_object_1_num, short _layer_object_2_num, MapObj _map)
+        {
+            Id = _id;
+            Active = active;
+            Type = _type;
 
+            layer_object_1_num = _layer_object_1_num;
+            layer_object_2_num = _layer_object_2_num;
+
+            isLinear = _isLinear;
+            layer_ground_level = _level;
+            layer_ground_slope = _slope;
+
+            if (_interactiveObjId != -1)
+            {
+                InteractiveObject = new InteractiveObject(_interactiveObjId, this);
+                _map.Interactives.TryAdd(Id, InteractiveObject);
+            }
+
+            byte Width = _map.Width;
+            int _calcul1 = Id / ((Width * 2) - 1);
+            int _calcul2 = Id - (_calcul1 * ((Width * 2) - 1));
+            int _calcul3 = _calcul2 % Width;
+            y = _calcul1 - _calcul3;
+            x = (Id - ((Width - 1) * y)) / Width;
+        }
         public int get_Distance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
 
         public bool get_IsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;

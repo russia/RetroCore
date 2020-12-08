@@ -1,60 +1,43 @@
 ﻿using RetroCore.Helpers;
-using RetroCore.Helpers.MapsReader;
 using RetroCore.Helpers.MapsReader.Types;
 using RetroCore.Manager.MapManager.Interactives;
 using RetroCore.Others;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace RetroCore.Manager.MapManager
+namespace RetroCore.Manager.MapManager.WorldPathFinder
 {
-    public class Map : IDisposable
+    public class MapObj : IDisposable
     {
+        //WorldPathFinder
+        public MapObj Parent;
+
         public short Id { get; set; }
         public byte Width { get; set; }
         public byte Height { get; set; }
         public int xCoord { get; set; }
         public int yCoord { get; set; }
-        public bool Map_updated { get; protected set; }
-
+        public MapDatas MapDatas { get; set; }
         public Cell CurrentCell { get; set; }
         public List<Cell> ActualPath;
         public ConcurrentDictionary<int, Entity> Entities;
         public ConcurrentDictionary<int, InteractiveObject> Interactives;
         public Cell[] Cells;
 
-        public Client _client { get; set; }
-
-        public Map(Client client)
+        public MapObj(MapDatas map)
         {
-            this._client = client;
             ActualPath = new List<Cell>();
             Entities = new ConcurrentDictionary<int, Entity>();
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
-        }
-
-        #region updates
-
-        public void UpdateMapData(string packet)
-        {
-            Task.Factory.StartNew(() =>
-            {
-                Dispose();
-                string[] splitted = packet.Split('|');
-                MapDatas map = DataManager.GetMapContent(splitted[1], splitted[2], splitted[3]);
-                Id = (short)map.Id;
-                Width = byte.Parse(map.SwfDatas.Width.ToString());
-                Height = byte.Parse(map.SwfDatas.Height.ToString());
-                xCoord = map.xPos;
-                yCoord = map.yPos;
-                DecompressMap(map.SwfDatas.DecypheredMapData);
-                Map_updated = true;
-                StringHelper.WriteLine($"Current map Coords : [{_client.MapManager.xCoord},{_client.MapManager.yCoord} Area [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).AreaId}] - SubArea [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).SubAreaId}]]", ConsoleColor.Green);
-                StringHelper.WriteLine($"Current size : [{_client.MapManager.Width},{_client.MapManager.Height}]", ConsoleColor.Green);
-            });
+            MapDatas = map;
+            //Getting map infos
+            //Id = (short)map.Id;
+            //Width = byte.Parse(map.SwfDatas.Width.ToString());
+            //Height = byte.Parse(map.SwfDatas.Height.ToString());
+            //xCoord = map.xPos;
+            //yCoord = map.yPos;
+            DecompressMap(map.SwfDatas.DecypheredMapData);
         }
 
         #region Getters
@@ -100,12 +83,9 @@ namespace RetroCore.Manager.MapManager
 
         public void Dispose()
         {
-            Map_updated = false;
             Cells = null;
             Entities.Clear();
             Interactives.Clear();
         }
-
-        #endregion updates
     }
 }

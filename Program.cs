@@ -18,6 +18,7 @@ namespace RetroCore
 
         private static void Main(string[] args)
         {
+           
             Debug = Debugger.IsAttached;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             StringHelper.WriteLine("Initializing..", ConsoleColor.Blue);

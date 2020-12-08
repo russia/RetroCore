@@ -55,7 +55,8 @@ namespace RetroCore.Helpers.MapsReader
             var output = new StringBuilder(data.Length / 2);
             for (var i = 0; i < data.Length; i += 2)
             {
-                output.Append((char)int.Parse(data.Substring(i, 2), NumberStyles.HexNumber));
+                    output.Append((char)int.Parse(data.Substring(i,2), NumberStyles.HexNumber));
+
             }
             return output.ToString();
         }

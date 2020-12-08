@@ -6,7 +6,6 @@ using SwfDotNet.IO.Tags;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -41,7 +40,7 @@ namespace RetroCore.Helpers.MapsReader
                 return;
             }
             else
-                Constants.MapsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Ankama\\zaap\\retro\\resources\\app\\retroclient\\data\\maps";
+                Constants.MapsPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Ankama\\zaap\\retro\\resources\\app\\retroclient\\data\\maps\\";
             GamePathFound = true;
             string[] Files = Directory.GetFiles(Constants.MapsPath, "*.swf", SearchOption.TopDirectoryOnly);
             StringHelper.WriteLine($"[DataManager] {Files.Count()} maps found !", ConsoleColor.Cyan);
@@ -58,7 +57,7 @@ namespace RetroCore.Helpers.MapsReader
             if (!Directory.Exists($"{Constants.LangsPath}\\"))
                 Directory.CreateDirectory($"{Constants.LangsPath}\\");
             string[] Files = Directory.GetFiles(Constants.LangsPath, "*.swf", SearchOption.TopDirectoryOnly);
-            StringHelper.WriteLine($"[DataManager] {Files.Count()} langs found !", ConsoleColor.Cyan);
+            StringHelper.WriteLine($"[DataManager] {Files.Count()} lang(s) found !", ConsoleColor.Cyan);
             foreach (var file in Files)
             {
                 if (!file.Contains(LangsVersion))
@@ -75,10 +74,10 @@ namespace RetroCore.Helpers.MapsReader
 
         public static void DownloadMap(string id, string mapid)
         {
-            if (File.Exists($"{Constants.MapsPath}\\{id}_{mapid}X.swf"))
+            if (File.Exists($"{Constants.MapsPath}{id}_{mapid}X.swf"))
                 return;
             using (var client = new WebClient())
-                client.DownloadFile($"https://dofusretro.cdn.ankama.com/maps/" + id + "_" + mapid + "X.swf", $"{Constants.MapsPath}\\{id}_{mapid}X.swf");
+                client.DownloadFile($"https://dofusretro.cdn.ankama.com/maps/" + id + "_" + mapid + "X.swf", $"{Constants.MapsPath}{id}_{mapid}X.swf");
         }
 
         public static void DownloadLang(string langname)
@@ -89,18 +88,17 @@ namespace RetroCore.Helpers.MapsReader
                 client.DownloadFile($"https://dofusretro.cdn.ankama.com/lang/swf/" + langname + "_fr_" + LangsVersion + ".swf", $"{Constants.LangsPath}\\{langname}_fr_{LangsVersion}.swf");
         }
 
-        public static SwfDecompiledMap GetSwfContent(string id, string mapid, string map_key = "")
+        public static MapDatas GetMapContent(string id, string mapid, string map_key = "")
         {
-            Console.WriteLine(map_key);
             if (!GamePathFound)
             {
                 DownloadMap(id, mapid);
             }
             SwfDecompiledMap map = ReadSwfMap(id, mapid);
-            //GlobalMapsInfos.First(x => x.MapId == map.Id).OutDoor = map.OutDoor;
+            GlobalMapsInfos.First(x => x.Id == map.Id).SwfDatas = map;
             if (map_key != "")
-                map.DecypheredMapData = DecypherData(map.MapData, map_key);
-            return map;
+                map.DecypheredMapData = Hash.DecypherData(map.CypheredMapData, map_key);
+            return GlobalMapsInfos.First(x => x.Id == map.Id);
         }
 
         public static void ReadSwfLang(string path)
@@ -142,31 +140,33 @@ namespace RetroCore.Helpers.MapsReader
                             foreach (Match match2 in matches2)
                                 map.AreaId = int.Parse(match2.Groups[4].Value);
                         }
-                        Console.Write("\r{0} maps..", GlobalMapsInfos.Count());
-                        sb = "";
                         GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        sb = "";
+                        Console.Write($"\r{DateTime.Now.ToString("[HH:mm:ss:fff]")} [DataManager] {GlobalMapsInfos.Count()} maps loaded..");
                     }
                 }
             }
-
             Reader.Close();
             swf = null;
+
             Console.Write("\n");
             StringHelper.WriteLine($"[DataManager] {GlobalMapsInfos.Count()} maps added to list !", ConsoleColor.Cyan);
             StringHelper.WriteLine("[DataManager] Map with undefinied AreaId : " + GlobalMapsInfos.Count(x => x.AreaId == -1), ConsoleColor.Blue);
         }
 
-        public static List<SwfDecompiledMap> ReadListSwfMap(string id)
+        public static List<MapDatas> ReadListSwfMap(string id)
         {
-            List<SwfDecompiledMap> MapList = new List<SwfDecompiledMap>();
+            List<MapDatas> MapList = new List<MapDatas>();
 
-            var Files = Directory.GetFiles(Constants.MapsPath, "*.swf", SearchOption.TopDirectoryOnly).Where(x => x.Contains(id));
-
+            List<string> Files = Directory.GetFiles(Constants.MapsPath, "*.swf").ToList();
+            Files = Files.Where(x => x.Contains("\\" + id)).ToList();
+            SwfReader Reader;
             foreach (var mapFile in Files)
             {
                 string path = mapFile;
-                var map = new SwfDecompiledMap();
-                SwfReader Reader = new SwfReader(path);
+
+                Reader = new SwfReader(path);
                 Swf swf = Reader.ReadSwf();
 
                 IEnumerator enumerator = swf.Tags.GetEnumerator();
@@ -185,38 +185,34 @@ namespace RetroCore.Helpers.MapsReader
                             foreach (BaseAction obj in actions)
                                 sb += obj.ToString();
                         }
-
-                        //mapData
-                        map.MapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length));
-                        map.OutDoor = sb.Contains("True") ? true : false;
-                        sb = sb.Replace(StringHelper.UppercaseFirst(map.OutDoor.ToString()), "");
-                        sb = sb.Replace("(1 args)", "");
-
-                        var regex = @"push ([0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as var callMethod poppush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push  as bool setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as var";
-                        var matches = Regex.Matches(sb, regex);
-
-                        map.Id = int.Parse(matches.First().Groups[8].Value);
-                        map.Width = int.Parse(matches.First().Groups[10].Value);
-                        map.Height = int.Parse(matches.First().Groups[12].Value);
-                        map.XValue = DataManager.GlobalMapsInfos.First(x => x.MapId == map.Id).xPos;
-                        map.YValue = DataManager.GlobalMapsInfos.First(x => x.MapId == map.Id).yPos;
-                        MapList.Add(map);
+                        var content = ParseSwfMapDatas(sb);
+                        content.DecypheredMapData = Hash.DecypherData(content.CypheredMapData, MapKeyCracker.MapCrackKey(content.CypheredMapData));
+                        GlobalMapsInfos.First(x => x.Id == content.Id).SwfDatas.MapId = path.Substring(path.IndexOf(id) + id.Length+1, path.IndexOf(".swf") - (path.IndexOf(id) + id.Length + 1));
+                        MapList.Add(GlobalMapsInfos.First(x => x.Id == content.Id));
                         sb = "";
                     }
                 }
                 Reader.Close();
                 swf = null;
             }
+            //string mapDataDecompressed = "";
+            //foreach (var map in MapList) {
+            //    if (mapDataDecompressed == "") {
+            //        mapDataDecompressed = map.SwfDatas.DecypheredMapData;
+            //        continue;
+            //    }
+            //    if (map.SwfDatas.DecypheredMapData == mapDataDecompressed)
+            //        MapList.Remove(map);
+            //}
             return MapList;
         }
 
         public static SwfDecompiledMap ReadSwfMap(string id, string mapid)
         {
-            string path = (Constants.MapsPath + $"\\{id}" + "_" + $"{mapid}X.swf");
-            var map = new SwfDecompiledMap();
+            string path = (Constants.MapsPath + $"{id}" + "_" + $"{mapid}X.swf");
             SwfReader Reader = new SwfReader(path);
             Swf swf = Reader.ReadSwf();
-
+            SwfDecompiledMap mapDatas = null;
             IEnumerator enumerator = swf.Tags.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -233,59 +229,33 @@ namespace RetroCore.Helpers.MapsReader
                         foreach (BaseAction obj in actions)
                             sb += obj.ToString();
                     }
-
-                    //mapData
-                    map.MapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length));
-                    map.OutDoor = sb.Contains("True") ? true : false;
-                    sb = sb.Replace(StringHelper.UppercaseFirst(map.OutDoor.ToString()), "");
-                    sb = sb.Replace("(1 args)", "");
-
-                    var regex = @"push ([0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as var callMethod poppush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push  as bool setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as var";
-                    var matches = Regex.Matches(sb, regex);
-
-                    map.Id = int.Parse(matches.First().Groups[8].Value);
-                    map.Width = int.Parse(matches.First().Groups[10].Value);
-                    map.Height = int.Parse(matches.First().Groups[12].Value);
-                    map.XValue = DataManager.GlobalMapsInfos.First(x => x.MapId == map.Id).xPos;
-                    map.YValue = DataManager.GlobalMapsInfos.First(x => x.MapId == map.Id).yPos;
+                    mapDatas = ParseSwfMapDatas(sb);
                     sb = "";
                 }
             }
             Reader.Close();
             swf = null;
+            return mapDatas;
+        }
+
+        public static SwfDecompiledMap ParseSwfMapDatas(string sb)
+        {
+            SwfDecompiledMap map = new SwfDecompiledMap();
+            //mapData
+            map.CypheredMapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length)).Replace("'", "");
+            map.OutDoor = sb.Contains("True") ? true : false;
+            sb = sb.Replace(StringHelper.UppercaseFirst(map.OutDoor.ToString()), "");
+            sb = sb.Replace("(1 args)", "");
+
+            var regex = @"push ([0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as var callMethod poppush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push  as bool setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as var";
+            var matches = Regex.Matches(sb, regex);
+
+            map.Id = int.Parse(matches.First().Groups[8].Value);
+            map.Width = int.Parse(matches.First().Groups[10].Value);
+            map.Height = int.Parse(matches.First().Groups[12].Value);
+            GlobalMapsInfos.First(x => x.Id == map.Id).SwfDatas = map;
+
             return map;
         }
-
-        private static string DecypherData(string data, string decryptKey)
-        {
-            try
-            {
-                var result = string.Empty;
-
-                if (decryptKey == "") return data;
-
-                decryptKey = PrepareKey(decryptKey);
-                var checkSum = CheckSum(decryptKey) * 2;
-
-                for (int i = 0, k = 0; i < data.Length; i += 2)
-                    result += (char)(int.Parse(data.Substring(i, 2), NumberStyles.HexNumber) ^ decryptKey[(k++ + checkSum) % decryptKey.Length]);
-
-                return Uri.UnescapeDataString(result);
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        private static string PrepareKey(string key)
-        {
-            var keyResult = string.Empty;
-            for (var i = 0; i < key.Length; i += 2)
-                keyResult += Convert.ToChar(int.Parse(key.Substring(i, 2), NumberStyles.HexNumber));
-            return Uri.UnescapeDataString(keyResult);
-        }
-
-        private static int CheckSum(string data) => data.Sum(t => t % 16) % 16;
     }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RetroCore.Network
 {
-    public class SocketClient
+    public class SocketClient : IDisposable
     {
         public ProxySocket Socket { get; set; }
         public byte[] Buffer { get; set; } // buffer

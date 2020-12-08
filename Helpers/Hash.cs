@@ -1,6 +1,7 @@
 ﻿using RetroCore.Manager.MapManager;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -28,6 +29,38 @@ namespace RetroCore.Helpers
             }
             return ip.ToString();
         }
+
+        public static string DecypherData(string data, string decryptKey)
+        {
+            try
+            {
+                var result = string.Empty;
+
+                if (decryptKey == "") return data;
+
+                decryptKey = PrepareKey(decryptKey);
+                var checkSum = CheckSum(decryptKey) * 2;
+
+                for (int i = 0, k = 0; i < data.Length; i += 2)
+                    result += (char)(int.Parse(data.Substring(i, 2), NumberStyles.HexNumber) ^ decryptKey[(k++ + checkSum) % decryptKey.Length]);
+
+                return Uri.UnescapeDataString(result);
+            }
+            catch
+            {
+                return "error";
+            }
+        }
+
+        private static string PrepareKey(string key)
+        {
+            var keyResult = string.Empty;
+            for (var i = 0; i < key.Length; i += 2)
+                keyResult += Convert.ToChar(int.Parse(key.Substring(i, 2), NumberStyles.HexNumber));
+            return Uri.UnescapeDataString(keyResult);
+        }
+
+        private static int CheckSum(string data) => data.Sum(t => t % 16) % 16;
 
         public static short GetCellIdByHash(string hash)
         {
