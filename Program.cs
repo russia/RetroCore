@@ -1,6 +1,5 @@
 ﻿using RetroCore.Helpers;
 using RetroCore.Helpers.MapsReader;
-using RetroCore.Manager.MapManager.WorldPathFinder;
 using RetroCore.Network.Dispatcher;
 using System;
 using System.Diagnostics;
@@ -11,16 +10,10 @@ namespace RetroCore
 {
     internal class Program
     {
-        /*
-        https://google.github.io/styleguide/csharp-style.html
-        https://cdn.discordapp.com/attachments/309032714982522881/752115574808510564/Diagramme_des_packets_Dofus.png
-        https://funky-emu.net/uploads/monthly_2011_11/59fb3340d8092_MAPIDCELL.jpg.218d7f76b1bd94e4b499244d335c961f.jpg
-         */
         public static bool Debug;
 
         private static void Main()
         {
-           
             Debug = Debugger.IsAttached;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             StringHelper.WriteLine("Initializing..", ConsoleColor.Blue);

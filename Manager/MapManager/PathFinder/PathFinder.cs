@@ -9,7 +9,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
 {
     public class PathFinder : IClearable
     {
-        private Map CurrentMap;
+        private readonly Map CurrentMap;
         private List<Cell> mapCellsWalkable = new List<Cell>();
         private readonly List<Cell> visitedCells = new List<Cell>();
 
@@ -133,10 +133,10 @@ namespace RetroCore.Manager.MapManager.PathFinder
             mapCellsWalkable = currentMap.Cells.Where(x => x.IsWalkable() == true).ToList();
             mapCellsWalkable.ForEach(x => ClearCells(x));
            // Cell StartCell = currentMap.CurrentCell;
-            Cell StartCell = currentMap.Cells.First(x => x.IsWalkable());
+            Cell StartCell = currentMap.Cells.OrderBy(x => Guid.NewGuid()).First(x => x.IsWalkable()); //todo get la cellid 
             Cell DestinationCell = currentMap.GetCellById(cellId);
-            StringHelper.WriteLine("Start Cellid: " + StartCell.Id, ConsoleColor.Green);
-            StringHelper.WriteLine("Destination Cellid: " + DestinationCell.Id, ConsoleColor.Green);
+            //StringHelper.WriteLine("Start Cellid: " + StartCell.Id, ConsoleColor.Green);
+            //StringHelper.WriteLine("Destination Cellid: " + DestinationCell.Id, ConsoleColor.Green);
 
             List<Cell> Path = new List<Cell>();
             StartCell.SetDistance(StartCell.GetDistance(DestinationCell));
@@ -151,23 +151,8 @@ namespace RetroCore.Manager.MapManager.PathFinder
                 Cell checkCell = activeCells.OrderBy(x => x.CostDistance).First();
 
                 if (checkCell.X == DestinationCell.X && checkCell.Y == DestinationCell.Y)
-                {
-                    StringHelper.WriteLine("We found a way !", ConsoleColor.Green);
-                    //Cell tempCell = checkCell;
-                    //while (true) // while(tempCell.Parent == null) ?
-                    //{
-                    //    if (tempCell.Parent == null)
-                    //        break;
-
-                    //    Path.Add(tempCell.Parent);
-                    //    tempCell = tempCell.Parent;
-                    //}
-                    //Path.Reverse();
-                    //Path.Add(DestinationCell);
-                    //Path.ForEach(x => Console.WriteLine(x.Id + " -> "));
-
                     return true;
-                }
+                
 
                 visitedCells.Add(checkCell);
                 activeCells.Remove(checkCell);
@@ -192,8 +177,6 @@ namespace RetroCore.Manager.MapManager.PathFinder
                         activeCells.Add(walkablecell);
                 }
             }
-
-            StringHelper.WriteLine("No Path Found!",ConsoleColor.Green);
             return false;
         }
     }

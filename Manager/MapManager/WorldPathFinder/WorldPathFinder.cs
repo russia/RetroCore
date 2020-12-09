@@ -31,22 +31,7 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
                 Thread.Sleep(500);
             if (!IsEnabled)
                 throw new Exception("[WorldPathFinder] Sorry WorldPathFinder is only available if Dofus Retro is installed.");
-            //TODO: Utiliser AreaId au lieu de SubArea
-            //List<MapDatas> currentMapInfo = DataManager.GlobalMapsInfos.Where(x => x.XPos == _x && x.YPos == _y && x.SubAreaId == DataManager.GlobalMapsInfos.First(y => y.Id == Client.MapManager.Id).SubAreaId).ToList();
-            //currentMapInfo.ForEach(x => StringHelper.WriteLine($"{_x},{_y} mapId - [{x.Id}]", ConsoleColor.Yellow));
-
-            //List<Cell> availablesTeleporters = Teleporters.GetAccessiblesTeleporters(Client, CurrentMap);
-            //List<DirectionType> AvailableDirections = new List<DirectionType>();
-            //availablesTeleporters.ForEach(x => AvailableDirections.Add(Teleporters.GetTeleporterSide(x)));
-
-            //AvailableDirections.ForEach(x => Console.WriteLine("Direction possible : " + x.ToString()));
-
-            var test = GetWorldPath(2,-19);
-            Console.WriteLine(test.Count());
-            //GetNeighboursMaps(DirectionType.BOTTOM);
-            //GetNeighboursMaps(DirectionType.TOP);
-            //GetNeighboursMaps(DirectionType.LEFT);
-            //GetNeighboursMaps(DirectionType.RIGHT);
+            var test = GetWorldPath(-1, -22);
         }
 
         public List<Map> GetWorldPath(int xCoordsDestination, int yCoordsDestination)
@@ -54,12 +39,13 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
             Map StartMap = CurrentMap;
             //Todo replace First by where ?
             var DestinationMap = DataManager.GlobalMapsInfos.First(x => x.XPos == xCoordsDestination && x.YPos == yCoordsDestination && x.AreaId == DataManager.GlobalMapsInfos.First(y => y.Id == Client.MapManager.Id).AreaId);
-            StringHelper.WriteLine("Start map: " + StartMap.Id, ConsoleColor.Blue);
-            StringHelper.WriteLine("Destination map: " + DestinationMap.Id, ConsoleColor.Blue);
+            StringHelper.WriteLine("[WorldPathFinder] Start map: " + StartMap.Id, ConsoleColor.Cyan);
+            StringHelper.WriteLine("[WorldPathFinder] Destination map: " + DestinationMap.Id, ConsoleColor.Cyan);
 
-            Dictionary<Map, DirectionType> Path = new Dictionary<Map, DirectionType>();
+            //Dictionary<Map, DirectionType> Path = new Dictionary<Map, DirectionType>();
+            List<Map> Path = new List<Map>();
             StartMap.SetDistance(StartMap.GetDistance(DestinationMap.XPos, DestinationMap.YPos));
-            StringHelper.WriteLine("Distance (in maps) : " + StartMap.Distance, ConsoleColor.Blue);
+            StringHelper.WriteLine("[WorldPathFinder] Distance (in maps) : " + StartMap.Distance, ConsoleColor.Blue);
             List<Map> activeMaps = new List<Map>
             {
                 StartMap
@@ -71,7 +57,22 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
 
                 if (checkMap.XCoord == DestinationMap.XPos && checkMap.YCoord == DestinationMap.YPos)
                 {
-                    StringHelper.WriteLine("We found a way !", ConsoleColor.Blue);
+                    StringHelper.WriteLine("[WorldPathFinder] We found a way !", ConsoleColor.Green);
+
+                    Map tempMap = checkMap;
+                    while (true) // while(tempCell.Parent == null) ?
+                    {
+                        if (tempMap.ParentMap == null)
+                            break;
+
+                        Path.Add(tempMap.ParentMap);
+                        tempMap = tempMap.ParentMap;
+                    }
+                    Path.Reverse();
+                    //Path.Add(DestinationCell);
+                    Path.ForEach(x => Console.Write(x.Id + " -> "));
+
+                    return null;
                 }
 
                 visitedMaps.Add(checkMap);
@@ -98,20 +99,20 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
                 }
             }
 
-            Console.WriteLine("No Path Found!");
+            Console.WriteLine("[WorldPathFinder] No Path Found!");
             return null;
         }
 
         private List<Map> GetWalkableMaps(Map currentMap)//, Cell targetCell)
         {
+            StringHelper.WriteLine("[WorldPathFinder] GetWalkablemaps called !", ConsoleColor.Blue);
             var FinalList = new List<Map>();
             List<Cell> availablesTeleporters = Teleporters.GetAccessiblesTeleporters(Client, currentMap);
             List<DirectionType> AvailableDirections = new List<DirectionType>();
             availablesTeleporters.ForEach(x => AvailableDirections.Add(Teleporters.GetTeleporterSide(x)));
-            AvailableDirections.ForEach(x => FinalList.AddRange(GetNeighboursMaps(x)));
+            AvailableDirections.ForEach(x => FinalList.AddRange(GetNeighboursMaps(x, currentMap)));
             FinalList.RemoveAll(x => visitedMaps.Contains(x));
             FinalList.ForEach(x => x.SetParent(currentMap));
-            FinalList.ForEach(x => Console.WriteLine("GetWalkablemaps returned : " + x.Id));
             return FinalList;
         }
 
@@ -123,14 +124,13 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
             return result;
         }
 
-        private List<Map> GetNeighboursMaps(DirectionType Type)
+        private List<Map> GetNeighboursMaps(DirectionType Type, Map map)
         {
-            Coordinates wantedCoords = Directions.GetCoordsByDirection(CurrentMap, Type);
+            Coordinates wantedCoords = Directions.GetCoordsByDirection(map, Type);
             List<MapDatas> mapsList = DataManager.GlobalMapsInfos.Where(x => x.XPos == wantedCoords._x && x.YPos == wantedCoords._y).ToList();
             List<Map> finalMapList = new List<Map>();
             mapsList.ForEach(x => finalMapList.AddRange(GetMapDatas(x.Id)));
-            List<Map> outDoorList = finalMapList.Where(x => x.MapDatas.SwfDatas.OutDoor == true).ToList();
-            //outDoorList.ForEach(x => StringHelper.WriteLine($"{Type} map id {x.Id} | cells : {x.Cells.Count()} | teleporter {x.Cells.Count(x => x.IsTeleporter())}", ConsoleColor.Red));
+            List<Map> outDoorList = finalMapList.Where(x => x.MapDatas.SwfDatas.OutDoor == true && !visitedMaps.Contains(x)).ToList();
             return outDoorList;
         }
 

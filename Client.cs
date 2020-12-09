@@ -56,7 +56,7 @@ namespace RetroCore
             OnCharacterConnectionFinished();
         }
 
-        public Task OnCharacterConnectionFinished() => Task.Run(async () =>
+        public Task OnCharacterConnectionFinished() => Task.Run(async () => //Used to debug
         {
             await Task.Delay(3500); //todo find an other packet
             //WorldPathFinderManager.GetPath(MapManager.XCoord, MapManager.YCoord);
