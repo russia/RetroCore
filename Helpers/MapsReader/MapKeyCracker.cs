@@ -20,8 +20,9 @@ namespace RetroCore.Helpers.MapsReader
         private const int MinKeyXor = 32;
         private const int MaxKeyXor = 127;
         public static string HEX_CHARS = "0123456789ABCDEF";
-        public static string StatisticsPath = "./MapKeyCracker/statistics.json";
+        public static string StatisticsPath => Constants.OthersPath;
         private static Statistics statistics;
+
         public static Statistics LoadStatistics()
         {
             return JsonConvert.DeserializeAnonymousType<Statistics>(File.ReadAllText(StatisticsPath), new Statistics());
@@ -55,8 +56,7 @@ namespace RetroCore.Helpers.MapsReader
             var output = new StringBuilder(data.Length / 2);
             for (var i = 0; i < data.Length; i += 2)
             {
-                    output.Append((char)int.Parse(data.Substring(i,2), NumberStyles.HexNumber));
-
+                output.Append((char)int.Parse(data.Substring(i, 2), NumberStyles.HexNumber));
             }
             return output.ToString();
         }

@@ -34,12 +34,12 @@ namespace RetroCore.Helpers
         {
             try
             {
-                var result = string.Empty;
+                string result = string.Empty;
 
                 if (decryptKey == "") return data;
 
                 decryptKey = PrepareKey(decryptKey);
-                var checkSum = CheckSum(decryptKey) * 2;
+                int checkSum = CheckSum(decryptKey) * 2;
 
                 for (int i = 0, k = 0; i < data.Length; i += 2)
                     result += (char)(int.Parse(data.Substring(i, 2), NumberStyles.HexNumber) ^ decryptKey[(k++ + checkSum) % decryptKey.Length]);
@@ -54,7 +54,7 @@ namespace RetroCore.Helpers
 
         private static string PrepareKey(string key)
         {
-            var keyResult = string.Empty;
+            string keyResult = string.Empty;
             for (var i = 0; i < key.Length; i += 2)
                 keyResult += Convert.ToChar(int.Parse(key.Substring(i, 2), NumberStyles.HexNumber));
             return Uri.UnescapeDataString(keyResult);
@@ -85,16 +85,16 @@ namespace RetroCore.Helpers
             Cell DestinationCell = Path.Last();
 
             if (Path.Count < 3)
-                return DestinationCell.get_Direction(Path.First()) + Hash.getCellChar(DestinationCell.Id);
+                return DestinationCell.getDirection(Path.First()) + Hash.getCellChar(DestinationCell.Id);
 
             StringBuilder pathfinder = new StringBuilder();
-            char lastDirection = Path[1].get_Direction(Path.First()), currentDirection;
+            char lastDirection = Path[1].getDirection(Path.First()), currentDirection;
 
             for (int i = 2; i < Path.Count; i++)
             {
                 Cell actualCell = Path[i];
                 Cell previousCell = Path[i - 1];
-                currentDirection = actualCell.get_Direction(previousCell);
+                currentDirection = actualCell.getDirection(previousCell);
 
                 if (lastDirection != currentDirection)
                 {

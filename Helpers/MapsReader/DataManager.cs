@@ -26,6 +26,8 @@ namespace RetroCore.Helpers.MapsReader
             GamePathFound = Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Ankama\\zaap\\retro\\resources\\app\\retroclient\\data");
             InitializeMaps();
             InitializeLangs();
+            if (!File.Exists(Constants.OthersPath))
+                throw new Exception("Can't find statistics.json in /others/ folder."); 
             ReadSwfLang($"{Constants.LangsPath}\\{RequiredLangs[0]}_fr_{LangsVersion}.swf"); //on trouvera bien une utilité à RequiredLangs
         }
 
@@ -67,33 +69,30 @@ namespace RetroCore.Helpers.MapsReader
                     File.Delete(file);
                 }
             }
-
-            foreach (var langname in RequiredLangs)
-                DownloadLang(langname);
+            RequiredLangs.ToList().ForEach(x => DownloadLang(x));
         }
 
         public static void DownloadMap(string id, string mapid)
         {
             if (File.Exists($"{Constants.MapsPath}{id}_{mapid}X.swf"))
                 return;
-            using (WebClient client = new WebClient())
-                client.DownloadFile($"https://dofusretro.cdn.ankama.com/maps/" + id + "_" + mapid + "X.swf", $"{Constants.MapsPath}{id}_{mapid}X.swf");
+            using WebClient client = new WebClient();
+            client.DownloadFile($"https://dofusretro.cdn.ankama.com/maps/" + id + "_" + mapid + "X.swf", $"{Constants.MapsPath}{id}_{mapid}X.swf");
         }
 
         public static void DownloadLang(string langname)
         {
             if (File.Exists($"{Constants.LangsPath}\\{langname}_fr_{LangsVersion}.swf"))
                 return;
-            using (WebClient client = new WebClient())
-                client.DownloadFile($"https://dofusretro.cdn.ankama.com/lang/swf/" + langname + "_fr_" + LangsVersion + ".swf", $"{Constants.LangsPath}\\{langname}_fr_{LangsVersion}.swf");
+            using WebClient client = new WebClient();
+            client.DownloadFile($"https://dofusretro.cdn.ankama.com/lang/swf/" + langname + "_fr_" + LangsVersion + ".swf", $"{Constants.LangsPath}\\{langname}_fr_{LangsVersion}.swf");
         }
 
         public static MapDatas GetMapContent(string id, string mapid, string map_key = "")
         {
             if (!GamePathFound)
-            {
                 DownloadMap(id, mapid);
-            }
+
             SwfDecompiledMap map = ReadSwfMap(id, mapid);
             GlobalMapsInfos.First(x => x.Id == map.Id).SwfDatas = map;
             if (map_key != "")
@@ -103,7 +102,7 @@ namespace RetroCore.Helpers.MapsReader
 
         public static void ReadSwfLang(string path)
         {
-            //This part is dirty but there arent so much ressources about how to decompile langs, decompilation & reading takes 12 secondes
+            //This part is dirty but there arent so much ressources about how to decompile langs, decompilation & reading takes more than12 secondes..
             StringHelper.WriteLine($"[DataManager] Reading maps lang ..", ConsoleColor.Cyan);
             SwfReader Reader = new SwfReader(path);
             Swf swf = Reader.ReadSwf();
@@ -228,7 +227,6 @@ namespace RetroCore.Helpers.MapsReader
                 }
             }
             Reader.Close();
-            swf = null;
             return mapDatas;
         }
 

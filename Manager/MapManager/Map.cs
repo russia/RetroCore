@@ -19,10 +19,10 @@ namespace RetroCore.Manager.MapManager
         public int xCoord { get; set; }
         public int yCoord { get; set; }
         public bool Map_updated { get; protected set; }
-
+        public MapDatas MapDatas { get; set; }
         public Cell CurrentCell { get; set; }
         public List<Cell> ActualPath;
-        public ConcurrentDictionary<int, Entity> Entities;
+        public ConcurrentDictionary<int, IEntity> Entities;
         public ConcurrentDictionary<int, InteractiveObject> Interactives;
         public Cell[] Cells;
 
@@ -32,10 +32,23 @@ namespace RetroCore.Manager.MapManager
         {
             this._client = client;
             ActualPath = new List<Cell>();
-            Entities = new ConcurrentDictionary<int, Entity>();
+            Entities = new ConcurrentDictionary<int, IEntity>();
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
         }
-
+        public Map(MapDatas map)
+        {
+            ActualPath = new List<Cell>();
+            Entities = new ConcurrentDictionary<int, IEntity>();
+            Interactives = new ConcurrentDictionary<int, InteractiveObject>();
+            MapDatas = map;
+            //Getting map infos
+            Id = (short)map.Id;
+            Width = byte.Parse(map.SwfDatas.Width.ToString());
+            Height = byte.Parse(map.SwfDatas.Height.ToString());
+            xCoord = map.xPos;
+            yCoord = map.yPos;
+            DecompressMap(map.SwfDatas.DecypheredMapData);
+        }
         #region updates
 
         public void UpdateMapData(string packet)

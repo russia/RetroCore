@@ -2,7 +2,7 @@
 
 namespace RetroCore.Manager.MapManager
 {
-    public class Entity
+    public class IEntity
     {
         public interface Entities : IDisposable
         {

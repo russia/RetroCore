@@ -1,4 +1,5 @@
 ﻿using RetroCore.Helpers;
+using RetroCore.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +7,10 @@ using System.Threading;
 
 namespace RetroCore.Manager.MapManager.PathFinder
 {
-    public class PathFinder
+    public class PathFinder : IClearable
     {
         private Client Client;
-        private List<Cell> mapCellsWalkable = new List<Cell>();     
+        private List<Cell> mapCellsWalkable = new List<Cell>();
         private List<Cell> visitedCells = new List<Cell>();
 
         public PathFinder(Client client)
@@ -19,12 +20,10 @@ namespace RetroCore.Manager.MapManager.PathFinder
 
         public void Refresh()
         {
-            mapCellsWalkable.Clear();
-            visitedCells.Clear();
-
+            Clear();
             while (!Client.MapManager.Map_updated)
-                Thread.Sleep(500);
-            mapCellsWalkable = Client.MapManager.Cells.Where(x => x.is_Walkable() == true).ToList();
+                Thread.Sleep(50);
+            mapCellsWalkable = Client.MapManager.Cells.Where(x => x.isWalkable() == true).ToList();
         }
 
         public List<Cell> GetPath(short cellId)
@@ -36,7 +35,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
             StringHelper.WriteLine("Destination cellid: " + DestinationCell.Id, ConsoleColor.Blue);
 
             List<Cell> Path = new List<Cell>();
-            StartCell.SetDistance(StartCell.get_Distance(DestinationCell));
+            StartCell.SetDistance(StartCell.getDistance(DestinationCell));
 
             List<Cell> activeCells = new List<Cell>();
             activeCells.Add(StartCell);
@@ -50,7 +49,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
                     StringHelper.WriteLine("We found a way !", ConsoleColor.Blue);
                     Cell tempCell = checkCell;
 
-                    while (true)
+                    while (true) // while(tempCell.Parent == null) ?
                     {
                         if (tempCell.Parent == null)
                             break;
@@ -95,32 +94,30 @@ namespace RetroCore.Manager.MapManager.PathFinder
         public List<Cell> GetUnvisitedDiagonales(Cell currentCell)
         {
             List<Cell> OneCellsRadius = new List<Cell>();
-            OneCellsRadius = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
+            OneCellsRadius = mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.getDistance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
             List<Cell> Result = new List<Cell>();
             foreach (var cell in OneCellsRadius)
             {
-                IEnumerable<Cell> list = mapCellsWalkable.Where(x => x.get_Distance(cell) == 1 && x.Id != currentCell.Id);
-                foreach (Cell neighbours in list)
-                    Result.Add(neighbours);
+                IEnumerable<Cell> cells = mapCellsWalkable.Where(x => x.getDistance(cell) == 1 && x.Id != currentCell.Id);
+                cells.ToList().ForEach(x => Result.Add(x));
             }
             Result = Result.Where(x => Result.Where(y => y == x).Count() == 2).Distinct().ToList();
             return Result;
         }
 
-        public List<Cell> GetUnvisitedNeighbours(Cell currentCell) => mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.get_Distance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
+        public List<Cell> GetUnvisitedNeighbours(Cell currentCell) => mapCellsWalkable.Where(x => x.Id != currentCell.Id && x.getDistance(currentCell) == 1 && !visitedCells.Contains(x) && x.Parent == null).ToList();
 
         private List<Cell> GetWalkableCells(Cell currentCell, Cell targetCell)
         {
-            List<Cell> possibleTiles = GetUnvisitedDiagonales(currentCell);
-            possibleTiles.AddRange(GetUnvisitedNeighbours(currentCell));
-            foreach (var possibility in possibleTiles)
-            {
-                possibility.Parent = currentCell;
-                possibility.Cost++;
-                possibility.SetDistance(1);
-            }
-
-            return possibleTiles.ToList();
+            List<Cell> possibleCells = GetUnvisitedDiagonales(currentCell);
+            possibleCells.AddRange(GetUnvisitedNeighbours(currentCell));
+            possibleCells.ForEach(x => x.SetParent(currentCell));
+            return possibleCells.ToList();
+        }
+        public void Clear()
+        {
+            mapCellsWalkable.Clear();
+            visitedCells.Clear();
         }
     }
 }

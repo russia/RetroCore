@@ -94,7 +94,7 @@ namespace RetroCore.Network.Frames.Game
                     if (!client.isFighting)
                     {
                         id = int.Parse(entity.Substring(1));
-                        map.Entities.TryRemove(id, out Entity entityout);
+                        map.Entities.TryRemove(id, out IEntity entityout);
                     }
                 }
             }

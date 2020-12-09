@@ -1,5 +1,4 @@
 ﻿using RetroCore.Manager.MapManager.Interactives;
-using RetroCore.Manager.MapManager.WorldPathFinder.Helper;
 using RetroCore.Others;
 using System;
 using System.Linq;
@@ -28,6 +27,13 @@ namespace RetroCore.Manager.MapManager
         public Cell Parent { get; set; } = null;
 
         public static readonly int[] teleportTextures = { 1030, 1029, 4088 };
+
+        public void SetParent(Cell parent)
+        {
+            Parent = parent;
+            Cost++;
+            SetDistance(1);
+        }
 
         public void SetDistance(int distance)
         {
@@ -63,38 +69,11 @@ namespace RetroCore.Manager.MapManager
             x = (Id - ((Width - 1) * y)) / Width;
         }
 
-        public Cell(short _id, bool active, CellsType _type, bool _isLinear, byte _level, byte _slope, short _interactiveObjId, short _layer_object_1_num, short _layer_object_2_num, MapObj _map)
-        {
-            Id = _id;
-            Active = active;
-            Type = _type;
+        public int getDistance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
 
-            layer_object_1_num = _layer_object_1_num;
-            layer_object_2_num = _layer_object_2_num;
+        public bool getIsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
 
-            isLinear = _isLinear;
-            layer_ground_level = _level;
-            layer_ground_slope = _slope;
-
-            if (_interactiveObjId != -1)
-            {
-                InteractiveObject = new InteractiveObject(_interactiveObjId, this);
-                _map.Interactives.TryAdd(Id, InteractiveObject);
-            }
-
-            byte Width = _map.Width;
-            int _calcul1 = Id / ((Width * 2) - 1);
-            int _calcul2 = Id - (_calcul1 * ((Width * 2) - 1));
-            int _calcul3 = _calcul2 % Width;
-            y = _calcul1 - _calcul3;
-            x = (Id - ((Width - 1) * y)) / Width;
-        }
-
-        public int get_Distance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
-
-        public bool get_IsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
-
-        public char get_Direction(Cell cell)
+        public char getDirection(Cell cell)
         {
             /** Diagonales **/
             if (x == cell.x)
@@ -111,12 +90,12 @@ namespace RetroCore.Manager.MapManager
             throw new Exception("Can't find direction.");
         }
 
-        public bool is_Teleporter() => teleportTextures.Contains(layer_object_1_num) || teleportTextures.Contains(layer_object_2_num);
+        public bool isTeleporter() => teleportTextures.Contains(layer_object_1_num) || teleportTextures.Contains(layer_object_2_num);
 
-        public bool is_Interactive() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null;
+        public bool isInteractive() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null;
 
-        public bool is_Walkable() => Active && Type != CellsType.NOT_WALKABLE && !is_Interactive_Walkable();
+        public bool isWalkable() => Active && Type != CellsType.NOT_WALKABLE && !isInteractive_Walkable();
 
-        public bool is_Interactive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && InteractiveObject.model != null && !InteractiveObject.model.Walkable;
+        public bool isInteractive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && InteractiveObject.model != null && !InteractiveObject.model.Walkable;
     }
 }

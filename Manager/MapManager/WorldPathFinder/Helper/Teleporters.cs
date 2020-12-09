@@ -18,13 +18,13 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder.Helper
         {
             return null;
         }
-        public static List<Cell> GetMapTeleporters(MapObj map) => map.Cells.Where(x => x.is_Teleporter() && TeleportersCellIds.Contains(x.Id)).ToList();
+        public static List<Cell> GetMapTeleporters(Map map) => map.Cells.Where(x => x.isTeleporter() && TeleportersCellIds.Contains(x.Id)).ToList();
 
 
     }
     public class PathInfos
     {
-        MapObj _map;
+        Map _map;
         
         public PathInfos()
         {

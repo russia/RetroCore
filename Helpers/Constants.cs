@@ -1,4 +1,6 @@
-﻿namespace RetroCore.Helpers
+﻿using System;
+
+namespace RetroCore.Helpers
 {
     public class Constants
     {
@@ -7,5 +9,6 @@
         public static string GameVersion = "1.33.6";
         public static string MapsPath;
         public static string LangsPath;
+        public static string OthersPath => AppDomain.CurrentDomain.BaseDirectory + @"others\statistics.json";
     }
 }
