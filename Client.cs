@@ -1,12 +1,16 @@
-﻿using RetroCore.Manager.MapManager;
+﻿using RetroCore.Helpers;
+using RetroCore.Interfaces;
+using RetroCore.Manager.MapManager;
 using RetroCore.Manager.MapManager.PathFinder;
 using RetroCore.Manager.MapManager.WorldPathFinder;
 using RetroCore.Network;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RetroCore
 {
-    public class Client
+    public class Client : IClearable, IDisposable
     {
         public string Username { get; protected set; }
         public string Password { get; protected set; }
@@ -35,7 +39,7 @@ namespace RetroCore
             this.Password = pass;
             Network = new SocketClient(this);
             MapManager = new Map(this);
-            PathFinderManager = new PathFinder(this);
+            PathFinderManager = new PathFinder(MapManager);
             WorldPathFinderManager = new WorldPathFinder(this);
         }
 
@@ -55,9 +59,10 @@ namespace RetroCore
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(3500); //todo find an other packet
+            //WorldPathFinderManager.GetPath(MapManager.XCoord, MapManager.YCoord);
             WorldPathFinderManager.GetPath(MapManager.XCoord, MapManager.YCoord);
-            //var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.is_Teleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
-            //var path = PathFinderManager.GetPath(26);
+            //var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.IsTeleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
+            ////var path = PathFinderManager.GetPath(26);
 
             //foreach (var cell in path)
             //{
@@ -69,5 +74,21 @@ namespace RetroCore
         });
 
         #endregion Events
+
+        public void Reconnect() => Network.Connection(Constants.AuthAddress, Constants.AuthPort); // add dispose in it ?
+
+        public void Dispose()
+        {
+            Network.Dispose();
+            Clear();
+        }
+
+        public void Clear()
+        {
+            Network = new SocketClient(this);
+            MapManager = new Map(this);
+            PathFinderManager = new PathFinder(MapManager);
+            WorldPathFinderManager = new WorldPathFinder(this);
+        }
     }
 }

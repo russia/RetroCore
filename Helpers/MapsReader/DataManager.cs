@@ -27,7 +27,7 @@ namespace RetroCore.Helpers.MapsReader
             InitializeMaps();
             InitializeLangs();
             if (!File.Exists(Constants.OthersPath))
-                throw new Exception("Can't find statistics.json in /others/ folder."); 
+                throw new Exception("Can't find statistics.json in /others/ folder.");
             ReadSwfLang($"{Constants.LangsPath}\\{RequiredLangs[0]}_fr_{LangsVersion}.swf"); //on trouvera bien une utilité à RequiredLangs
         }
 
@@ -236,15 +236,15 @@ namespace RetroCore.Helpers.MapsReader
                 CypheredMapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length)).Replace("'", ""),
                 OutDoor = sb.Contains("True")
             };
+
             sb = sb.Replace(StringHelper.UppercaseFirst(map.OutDoor.ToString()), "");
             sb = sb.Replace("(1 args)", "");
-
-            string regex = @"push ([0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as int push (-?[0-9]*?) as var getVariablepush ([0-9]*?) as var getMemberpush ([0-9]*?) as var callMethod poppush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push  as bool setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as var";
+            string regex = @"push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push  as bool setVariablepush ([0-9]*?) as var push ([0-9]*?) as int setVariablepush ([0-9]*?) as var push ([0-9]*?) as var setVariableend";
             MatchCollection matches = Regex.Matches(sb, regex);
 
-            map.Id = int.Parse(matches.First().Groups[8].Value);
-            map.Width = int.Parse(matches.First().Groups[10].Value);
-            map.Height = int.Parse(matches.First().Groups[12].Value);
+            map.Id = int.Parse(matches.First().Groups[1].Value);
+            map.Width = int.Parse(matches.First().Groups[3].Value);
+            map.Height = int.Parse(matches.First().Groups[5].Value);
             GlobalMapsInfos.First(x => x.Id == map.Id).SwfDatas = map;
 
             return map;

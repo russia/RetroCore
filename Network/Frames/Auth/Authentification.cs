@@ -71,6 +71,13 @@ namespace RetroCore.Network.Frames.Auth
         public void AuthentificationFailed(Client client, string packet)
         {
             StringHelper.WriteLine($"[{client.Username}:{client.Password}] can't login.", ConsoleColor.Red);
+            if (PacketsReceiver.GetPacketContent(packet).StartsWith("v"))
+            {
+                Constants.GameVersion = PacketsReceiver.GetPacketContent(packet).Replace("v","");
+                StringHelper.WriteLine($"[{client.Username}:{client.Password}] New version has been set ! Reconnecting..", ConsoleColor.Green);
+                client.Reconnect();
+            }
+                
             client.Network.Dispose();
         }
 

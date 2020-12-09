@@ -34,13 +34,12 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder
             List<MapDatas> currentMapInfo = DataManager.GlobalMapsInfos.Where(x => x.XPos == _x && x.YPos == _y && x.SubAreaId == DataManager.GlobalMapsInfos.First(y => y.Id == Client.MapManager.Id).SubAreaId).ToList();
             currentMapInfo.ForEach(x => StringHelper.WriteLine($"{_x},{_y} mapId - [{x.Id}]", ConsoleColor.Yellow));
 
-            GetNeighboursMaps(DirectionType.BOTTOM);
-            GetNeighboursMaps(DirectionType.TOP);
-            GetNeighboursMaps(DirectionType.LEFT);
-            GetNeighboursMaps(DirectionType.RIGHT);
+            List<Cell> availablesTeleporters = Teleporters.GetAccessiblesTeleporters(Client, CurrentMap);
 
-            List<Cell> TeleportersCell = Teleporters.GetMapTeleporters(CurrentMap);
-            TeleportersCell.ForEach(x => StringHelper.WriteLine($"Teleporter at cellId : {x.Id}", ConsoleColor.Red));
+            //GetNeighboursMaps(DirectionType.BOTTOM);
+            //GetNeighboursMaps(DirectionType.TOP);
+            //GetNeighboursMaps(DirectionType.LEFT);
+            //GetNeighboursMaps(DirectionType.RIGHT);
         }
 
         private List<Map> GetMapDatas(int id)
