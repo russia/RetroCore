@@ -10,14 +10,14 @@ namespace RetroCore.Manager.MapManager
         public short Id { get; set; }
         public bool Active { get; set; }
         public CellsType Type { get; set; }
-        public bool isLinear { get; set; } = false;
-        public byte layer_ground_level { get; set; }
-        public byte layer_ground_slope { get; set; }
-        public short layer_object_1_num { get; set; }
-        public short layer_object_2_num { get; set; }
+        public bool IsLinear { get; set; } = false;
+        public byte Layer_ground_level { get; set; }
+        public byte Layer_ground_slope { get; set; }
+        public short Layer_object_1_num { get; set; }
+        public short Layer_object_2_num { get; set; }
         public InteractiveObject InteractiveObject { get; set; }
-        public int x { get; set; } = 0;
-        public int y { get; set; } = 0;
+        public int X { get; set; } = 0;
+        public int Y { get; set; } = 0;
 
         #region pathfinder
 
@@ -48,12 +48,12 @@ namespace RetroCore.Manager.MapManager
             Active = active;
             Type = _type;
 
-            layer_object_1_num = _layer_object_1_num;
-            layer_object_2_num = _layer_object_2_num;
+            Layer_object_1_num = _layer_object_1_num;
+            Layer_object_2_num = _layer_object_2_num;
 
-            isLinear = _isLinear;
-            layer_ground_level = _level;
-            layer_ground_slope = _slope;
+            IsLinear = _isLinear;
+            Layer_ground_level = _level;
+            Layer_ground_slope = _slope;
 
             if (_interactiveObjId != -1)
             {
@@ -65,37 +65,37 @@ namespace RetroCore.Manager.MapManager
             int _calcul1 = Id / ((Width * 2) - 1);
             int _calcul2 = Id - (_calcul1 * ((Width * 2) - 1));
             int _calcul3 = _calcul2 % Width;
-            y = _calcul1 - _calcul3;
-            x = (Id - ((Width - 1) * y)) / Width;
+            Y = _calcul1 - _calcul3;
+            X = (Id - ((Width - 1) * Y)) / Width;
         }
 
-        public int getDistance(Cell destinationCell) => Math.Abs(x - destinationCell.x) + Math.Abs(y - destinationCell.y);
+        public int GetDistance(Cell destinationCell) => Math.Abs(X - destinationCell.X) + Math.Abs(Y - destinationCell.Y);
 
-        public bool getIsLinear(Cell destinationCell) => x == destinationCell.x || y == destinationCell.y;
+        public bool GetIsLinear(Cell destinationCell) => X == destinationCell.X || Y == destinationCell.Y;
 
-        public char getDirection(Cell cell)
+        public char GetDirection(Cell cell)
         {
             /** Diagonales **/
-            if (x == cell.x)
-                return cell.y < y ? (char)(3 + 'a') : (char)(7 + 'a');
-            else if (y == cell.y)
-                return cell.x < x ? (char)(1 + 'a') : (char)(5 + 'a');
+            if (X == cell.X)
+                return cell.Y < Y ? (char)(3 + 'a') : (char)(7 + 'a');
+            else if (Y == cell.Y)
+                return cell.X < X ? (char)(1 + 'a') : (char)(5 + 'a');
 
             /** Lines **/
-            else if (x > cell.x)
-                return y > cell.y ? (char)(2 + 'a') : (char)(0 + 'a');
-            else if (x < cell.x)
-                return y < cell.y ? (char)(6 + 'a') : (char)(4 + 'a');
+            else if (X > cell.X)
+                return Y > cell.Y ? (char)(2 + 'a') : (char)(0 + 'a');
+            else if (X < cell.X)
+                return Y < cell.Y ? (char)(6 + 'a') : (char)(4 + 'a');
 
             throw new Exception("Can't find direction.");
         }
 
-        public bool isTeleporter() => teleportTextures.Contains(layer_object_1_num) || teleportTextures.Contains(layer_object_2_num);
+        public bool IsTeleporter() => teleportTextures.Contains(Layer_object_1_num) || teleportTextures.Contains(Layer_object_2_num);
 
-        public bool isInteractive() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null;
+        public bool IsInteractive() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null;
 
-        public bool isWalkable() => Active && Type != CellsType.NOT_WALKABLE && !isInteractive_Walkable();
+        public bool IsWalkable() => Active && Type != CellsType.NOT_WALKABLE && !IsInteractive_Walkable();
 
-        public bool isInteractive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && InteractiveObject.model != null && !InteractiveObject.model.Walkable;
+        public bool IsInteractive_Walkable() => Type == CellsType.INTERACTIVE_OBJECT || InteractiveObject != null && InteractiveObject.Model != null && !InteractiveObject.Model.Walkable;
     }
 }

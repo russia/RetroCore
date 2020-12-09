@@ -2,15 +2,15 @@
 {
     public class AnimationDuration
     {
-        public int straight { get; private set; }
-        public int horizontal { get; private set; }
-        public int vertical { get; private set; }
+        public int Straight { get; private set; }
+        public int Horizontal { get; private set; }
+        public int Vertical { get; private set; }
 
         public AnimationDuration(int _straight, int _horizontal, int _vertical)
         {
-            straight = _straight;
-            horizontal = _horizontal;
-            vertical = _vertical;
+            Straight = _straight;
+            Horizontal = _horizontal;
+            Vertical = _vertical;
         }
     }
 }

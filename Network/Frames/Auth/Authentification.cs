@@ -39,7 +39,7 @@ namespace RetroCore.Network.Frames.Auth
         [PacketId("M01")]
         public void Inactivity(Client client, string packet)
         {
-            packet = PacketsReceiver.GetPacketContent(packet);
+            //packet = PacketsReceiver.GetPacketContent(packet);
             StringHelper.WriteLine($"Disconnected for inactivity..", ConsoleColor.Red);
         }
 
@@ -47,12 +47,12 @@ namespace RetroCore.Network.Frames.Auth
         public void GetServersStates(Client client, string packet)
         {
             string[] availableServersDatas = PacketsReceiver.GetPacketContent(packet).Substring(2).Split('|');
-            foreach (string servDatas in availableServersDatas)
-            {
-                string[] splitter = servDatas.Split(';');
-                int id = int.Parse(splitter[0]);
-                ServerStatus state = (ServerStatus)byte.Parse(splitter[1]);
-            }
+            //foreach (string servDatas in availableServersDatas)
+            //{
+            //    //string[] splitter = servDatas.Split(';');
+            //    //int id = int.Parse(splitter[0]);
+            //    //ServerStatus state = (ServerStatus)byte.Parse(splitter[1]);
+            //}
         }
 
         [PacketId("M013")]

@@ -16,8 +16,8 @@ namespace RetroCore.Manager.MapManager
         public short Id { get; set; }
         public byte Width { get; set; }
         public byte Height { get; set; }
-        public int xCoord { get; set; }
-        public int yCoord { get; set; }
+        public int XCoord { get; set; }
+        public int YCoord { get; set; }
         public bool Map_updated { get; protected set; }
         public MapDatas MapDatas { get; set; }
         public Cell CurrentCell { get; set; }
@@ -26,11 +26,11 @@ namespace RetroCore.Manager.MapManager
         public ConcurrentDictionary<int, InteractiveObject> Interactives;
         public Cell[] Cells;
 
-        public Client _client { get; set; }
+        public Client Client { get; set; }
 
         public Map(Client client)
         {
-            this._client = client;
+            this.Client = client;
             ActualPath = new List<Cell>();
             Entities = new ConcurrentDictionary<int, IEntity>();
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
@@ -45,8 +45,8 @@ namespace RetroCore.Manager.MapManager
             Id = (short)map.Id;
             Width = byte.Parse(map.SwfDatas.Width.ToString());
             Height = byte.Parse(map.SwfDatas.Height.ToString());
-            xCoord = map.xPos;
-            yCoord = map.yPos;
+            XCoord = map.XPos;
+            YCoord = map.YPos;
             DecompressMap(map.SwfDatas.DecypheredMapData);
         }
         #region updates
@@ -61,12 +61,12 @@ namespace RetroCore.Manager.MapManager
                 Id = (short)map.Id;
                 Width = byte.Parse(map.SwfDatas.Width.ToString());
                 Height = byte.Parse(map.SwfDatas.Height.ToString());
-                xCoord = map.xPos;
-                yCoord = map.yPos;
+                XCoord = map.XPos;
+                YCoord = map.YPos;
                 DecompressMap(map.SwfDatas.DecypheredMapData);
                 Map_updated = true;
-                StringHelper.WriteLine($"Current map Coords : [{_client.MapManager.xCoord},{_client.MapManager.yCoord} Area [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).AreaId}] - SubArea [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).SubAreaId}]]", ConsoleColor.Green);
-                StringHelper.WriteLine($"Current size : [{_client.MapManager.Width},{_client.MapManager.Height}]", ConsoleColor.Green);
+                StringHelper.WriteLine($"Current map Coords : [{Client.MapManager.XCoord},{Client.MapManager.YCoord} Area [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).AreaId}] - SubArea [{DataManager.GlobalMapsInfos.First(x => x.Id == Id).SubAreaId}]]", ConsoleColor.Green);
+                StringHelper.WriteLine($"Current size : [{Client.MapManager.Width},{Client.MapManager.Height}]", ConsoleColor.Green);
             });
         }
 

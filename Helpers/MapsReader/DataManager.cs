@@ -19,7 +19,7 @@ namespace RetroCore.Helpers.MapsReader
 
         public static bool GamePathFound = false;
         private static string LangsVersion = "";
-        private static string[] RequiredLangs = { "maps" };
+        private static readonly string[] RequiredLangs = { "maps" };
 
         public static void Initialize()
         {
@@ -142,7 +142,7 @@ namespace RetroCore.Helpers.MapsReader
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                         sb = "";
-                        Console.Write($"\r{DateTime.Now.ToString("[HH:mm:ss:fff]")} [DataManager] {GlobalMapsInfos.Count()} maps loaded..");
+                        Console.Write($"\r{DateTime.Now:[HH:mm:ss:fff]} [DataManager] {GlobalMapsInfos.Count()} maps loaded..");
                     }
                 }
             }
@@ -223,7 +223,6 @@ namespace RetroCore.Helpers.MapsReader
                             sb += obj.ToString();
                     }
                     mapDatas = ParseSwfMapDatas(sb);
-                    sb = "";
                 }
             }
             Reader.Close();
@@ -232,9 +231,11 @@ namespace RetroCore.Helpers.MapsReader
 
         public static SwfDecompiledMap ParseSwfMapDatas(string sb)
         {
-            SwfDecompiledMap map = new SwfDecompiledMap();
-            map.CypheredMapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length)).Replace("'", "");
-            map.OutDoor = sb.Contains("True") ? true : false;
+            SwfDecompiledMap map = new SwfDecompiledMap
+            {
+                CypheredMapData = sb.Substring(sb.IndexOf("mapData','") + "mapData','".Length, sb.IndexOf("push") - (sb.IndexOf("mapData','") + "mapData','".Length)).Replace("'", ""),
+                OutDoor = sb.Contains("True")
+            };
             sb = sb.Replace(StringHelper.UppercaseFirst(map.OutDoor.ToString()), "");
             sb = sb.Replace("(1 args)", "");
 

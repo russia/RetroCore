@@ -6,23 +6,14 @@ namespace RetroCore.Manager.MapManager.WorldPathFinder.Helper
     {
         public static Coordinates GetCoordsByDirection(Map currentMap, DirectionType type)
         {
-            switch (type)
+            return type switch
             {
-                case DirectionType.TOP:
-                    return new Coordinates(currentMap.xCoord, currentMap.yCoord - 1);
-
-                case DirectionType.BOTTOM:
-                    return new Coordinates(currentMap.xCoord, currentMap.yCoord + 1);
-
-                case DirectionType.LEFT:
-                    return new Coordinates(currentMap.xCoord - 1, currentMap.yCoord);
-
-                case DirectionType.RIGHT:
-                    return new Coordinates(currentMap.xCoord + 1, currentMap.yCoord);
-
-                default:
-                    return null;
-            }
+                DirectionType.TOP => new Coordinates(currentMap.XCoord, currentMap.YCoord - 1),
+                DirectionType.BOTTOM => new Coordinates(currentMap.XCoord, currentMap.YCoord + 1),
+                DirectionType.LEFT => new Coordinates(currentMap.XCoord - 1, currentMap.YCoord),
+                DirectionType.RIGHT => new Coordinates(currentMap.XCoord + 1, currentMap.YCoord),
+                _ => null,
+            };
         }
     }
 

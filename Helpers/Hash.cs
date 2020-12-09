@@ -80,37 +80,37 @@ namespace RetroCore.Helpers
             return (short)(code1 + code2);
         }
 
-        public static string getHashedPath(List<Cell> Path)
+        public static string GetHashedPath(List<Cell> Path)
         {
             Cell DestinationCell = Path.Last();
 
             if (Path.Count < 3)
-                return DestinationCell.getDirection(Path.First()) + Hash.getCellChar(DestinationCell.Id);
+                return DestinationCell.GetDirection(Path.First()) + Hash.GetCellChar(DestinationCell.Id);
 
             StringBuilder pathfinder = new StringBuilder();
-            char lastDirection = Path[1].getDirection(Path.First()), currentDirection;
+            char lastDirection = Path[1].GetDirection(Path.First()), currentDirection;
 
             for (int i = 2; i < Path.Count; i++)
             {
                 Cell actualCell = Path[i];
                 Cell previousCell = Path[i - 1];
-                currentDirection = actualCell.getDirection(previousCell);
+                currentDirection = actualCell.GetDirection(previousCell);
 
                 if (lastDirection != currentDirection)
                 {
                     pathfinder.Append(lastDirection);
-                    pathfinder.Append(Hash.getCellChar(previousCell.Id));
+                    pathfinder.Append(Hash.GetCellChar(previousCell.Id));
 
                     lastDirection = currentDirection;
                 }
             }
 
             pathfinder.Append(lastDirection);
-            pathfinder.Append(Hash.getCellChar(DestinationCell.Id));
+            pathfinder.Append(Hash.GetCellChar(DestinationCell.Id));
             return pathfinder.ToString();
         }
 
-        public static string getCellChar(short cellId) => HashTable[cellId / 64] + "" + HashTable[cellId % 64];
+        public static string GetCellChar(short cellId) => HashTable[cellId / 64] + "" + HashTable[cellId % 64];
 
         public static int GetPort(char[] chars)
         {

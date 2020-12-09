@@ -4,10 +4,10 @@ namespace RetroCore.Manager.MapManager
 {
     public class IEntity
     {
-        public interface Entities : IDisposable
+        public interface IEntities : IDisposable
         {
-            int id { get; set; }
-            Cell cell { get; set; }
+            int Id { get; set; }
+            Cell Cell { get; set; }
         }
     }
 }

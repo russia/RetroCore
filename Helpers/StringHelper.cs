@@ -8,7 +8,7 @@ namespace RetroCore.Helpers
     {
         private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
 
         public static void WriteLine(string msg, ConsoleColor color = ConsoleColor.White)
         {
@@ -44,8 +44,8 @@ namespace RetroCore.Helpers
             int index = 0;
             while (index < rnd)
             {
-                str1 = str1 + GetRandomChar();
-                index = index + 1;
+                str1 += GetRandomChar();
+                index += 1;
             }
             string result = Checksum(str1) + str1;
             return result + Checksum(result);

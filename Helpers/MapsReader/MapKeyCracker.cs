@@ -36,7 +36,7 @@ namespace RetroCore.Helpers.MapsReader
         public static string MapCrackKey(string keyValue)
         {
             string EncodedData = HexToString(keyValue);
-            int KeyLength = ComputeKeyLengthFriedman(statistics, EncodedData);
+            int KeyLength = ComputeKeyLengthFriedman(EncodedData);
             ComputedKey Key = GuessKey(EncodedData, KeyLength, statistics);
             return FormatKeyExport(Key.Value);
         }
@@ -141,7 +141,7 @@ namespace RetroCore.Helpers.MapsReader
                 .Aggregate(0.0, (acc, freq) => acc + ((freq * (freq - 1)) / (length * (length - 1))));
         }
 
-        public static int ComputeKeyLengthFriedman(Statistics statistics, string encodedData)
+        public static int ComputeKeyLengthFriedman(string encodedData)
         {
             var bestCoincidence = double.MinValue;
             var bestKeyLength = -1;
@@ -255,7 +255,7 @@ namespace RetroCore.Helpers.MapsReader
 
         private static double ComputeError(string decrypted, int blockOffset, int blockSize, Statistics statistics)
         {
-            var frequencies = GetFrequencies(decrypted);
+            //var frequencies = GetFrequencies(decrypted);
             return GetPositionError(decrypted, blockOffset, blockSize, statistics);
         }
 

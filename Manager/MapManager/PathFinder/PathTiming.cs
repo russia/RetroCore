@@ -29,22 +29,22 @@ namespace RetroCore.Manager.MapManager.PathFinder
             {
                 nextCell = path[i];
 
-                if (currentCell.y == nextCell.y)
-                    movementTime += animationType.horizontal;
-                else if (currentCell.x == nextCell.y)
-                    movementTime += animationType.vertical;
+                if (currentCell.Y == nextCell.Y)
+                    movementTime += animationType.Horizontal;
+                else if (currentCell.X == nextCell.Y)
+                    movementTime += animationType.Vertical;
                 else
-                    movementTime += animationType.straight;
+                    movementTime += animationType.Straight;
 
-                if (currentCell.layer_ground_level < nextCell.layer_ground_level)
+                if (currentCell.Layer_ground_level < nextCell.Layer_ground_level)
                     movementTime += 100;
-                else if (nextCell.layer_ground_level > currentCell.layer_ground_level)
+                else if (nextCell.Layer_ground_level > currentCell.Layer_ground_level)
                     movementTime -= 100;
-                else if (currentCell.layer_ground_slope != nextCell.layer_ground_slope)
+                else if (currentCell.Layer_ground_slope != nextCell.Layer_ground_slope)
                 {
-                    if (currentCell.layer_ground_slope == 1)
+                    if (currentCell.Layer_ground_slope == 1)
                         movementTime += 100;
-                    else if (nextCell.layer_ground_slope == 1)
+                    else if (nextCell.Layer_ground_slope == 1)
                         movementTime -= 100;
                 }
                 currentCell = nextCell;

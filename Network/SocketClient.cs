@@ -16,10 +16,10 @@ namespace RetroCore.Network
     {
         public ProxySocket Socket { get; set; }
         public byte[] Buffer { get; set; } // buffer
-        private SemaphoreSlim Semaphore;
+        private readonly SemaphoreSlim Semaphore;
         private const int BufferSize = 16384;
         public bool isDisposed = false;
-        private Client Client;
+        private readonly Client Client;
         public PingManager Ping;
 
         public SocketClient(Client client)

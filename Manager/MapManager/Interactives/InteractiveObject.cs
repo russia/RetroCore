@@ -2,22 +2,22 @@
 {
     public class InteractiveObject
     {
-        public short gfx { get; private set; }
-        public Cell cell { get; private set; }
-        public InteractiveModel model { get; private set; }
-        public bool isUsable { get; set; } = false;
+        public short Gfx { get; private set; }
+        public Cell Cell { get; private set; }
+        public InteractiveModel Model { get; private set; }
+        public bool IsUsable { get; set; } = false;
 
         public InteractiveObject(short _gfx, Cell _cell)
         {
-            gfx = _gfx;
-            cell = _cell;
+            Gfx = _gfx;
+            Cell = _cell;
 
-            InteractiveModel _model = InteractiveModel.GetGfxModel(gfx);
+            InteractiveModel _model = InteractiveModel.GetGfxModel(Gfx);
 
             if (_model != null)
             {
-                model = _model;
-                isUsable = true;
+                Model = _model;
+                IsUsable = true;
             }
         }
     }

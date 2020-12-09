@@ -17,7 +17,7 @@ namespace RetroCore
 
         #region States
 
-        public bool isFighting { get; set; } = false;
+        public bool IsFighting { get; set; } = false;
 
         #endregion States
 
@@ -55,7 +55,7 @@ namespace RetroCore
         public Task OnCharacterConnectionFinished() => Task.Run(async () =>
         {
             await Task.Delay(3500); //todo find an other packet
-            WorldPathFinderManager.GetPath(MapManager.xCoord, MapManager.yCoord);
+            WorldPathFinderManager.GetPath(MapManager.XCoord, MapManager.YCoord);
             //var path = PathFinderManager.GetPath(MapManager.Cells.Where(x => x.is_Teleporter() == true).OrderBy(x => Guid.NewGuid()).First().Id);
             //var path = PathFinderManager.GetPath(26);
 

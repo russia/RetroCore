@@ -18,7 +18,7 @@ namespace RetroCore
          */
         public static bool Debug;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
            
             Debug = Debugger.IsAttached;

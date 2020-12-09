@@ -71,7 +71,7 @@ namespace RetroCore.Network.Frames.Game
                             break;
 
                         default:// player
-                            if (client.isFighting)
+                            if (client.IsFighting)
                             {
                                 int vitality = int.Parse(informations[14]);
                                 byte pa = byte.Parse(informations[15]);
@@ -91,7 +91,7 @@ namespace RetroCore.Network.Frames.Game
 
                 if (entity[0].Equals('-'))
                 {
-                    if (!client.isFighting)
+                    if (!client.IsFighting)
                     {
                         id = int.Parse(entity.Substring(1));
                         map.Entities.TryRemove(id, out IEntity entityout);

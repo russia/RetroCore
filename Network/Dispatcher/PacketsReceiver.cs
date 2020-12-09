@@ -10,7 +10,7 @@ namespace RetroCore.Network.Dispatcher
     internal static class PacketsReceiver
     {
         private static bool IsInitialized = false;
-        private static List<PacketData> Methods = new List<PacketData>();
+        private static readonly List<PacketData> Methods = new List<PacketData>();
 
         public static void Initialize()
         {
