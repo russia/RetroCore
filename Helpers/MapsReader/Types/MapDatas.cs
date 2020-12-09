@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RetroCore.Helpers.MapsReader.Types
+﻿namespace RetroCore.Helpers.MapsReader.Types
 {
     public class MapDatas
     {
@@ -18,6 +16,5 @@ namespace RetroCore.Helpers.MapsReader.Types
             YPos = _y;
             SubAreaId = _subAreaId;
         }
-
     }
 }

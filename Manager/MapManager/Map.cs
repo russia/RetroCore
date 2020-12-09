@@ -27,8 +27,10 @@ namespace RetroCore.Manager.MapManager
         public Cell[] Cells;
 
         public Client Client { get; set; }
+
         //WorldPathFinder
         public Map ParentMap { get; set; } = null;
+
         public int Cost { get; set; }
         public int Distance { get; set; }
         public int CostDistance => Cost + Distance;
@@ -39,13 +41,16 @@ namespace RetroCore.Manager.MapManager
             Cost++;
             SetDistance(1);
         }
+
         public int GetDistance(int xDestination, int yDestination) => Math.Abs(XCoord - xDestination) + Math.Abs(YCoord - yDestination);
+
         public int GetDistance(Map destinationMap) => Math.Abs(XCoord - destinationMap.XCoord) + Math.Abs(YCoord - destinationMap.YCoord);
 
         public void SetDistance(int distance)
         {
             this.Distance = distance;
         }
+
         /////////
 
         public Map(Client client)
@@ -55,6 +60,7 @@ namespace RetroCore.Manager.MapManager
             Entities = new ConcurrentDictionary<int, IEntity>();
             Interactives = new ConcurrentDictionary<int, InteractiveObject>();
         }
+
         public Map(MapDatas map)
         {
             ActualPath = new List<Cell>();
@@ -69,6 +75,7 @@ namespace RetroCore.Manager.MapManager
             YCoord = map.YPos;
             DecompressMap(map.SwfDatas.DecypheredMapData);
         }
+
         #region updates
 
         public void UpdateMapData(string packet)

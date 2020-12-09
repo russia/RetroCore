@@ -132,8 +132,8 @@ namespace RetroCore.Manager.MapManager.PathFinder
             Clear();
             mapCellsWalkable = currentMap.Cells.Where(x => x.IsWalkable() == true).ToList();
             mapCellsWalkable.ForEach(x => ClearCells(x));
-           // Cell StartCell = currentMap.CurrentCell;
-            Cell StartCell = currentMap.Cells.OrderBy(x => Guid.NewGuid()).First(x => x.IsWalkable()); //todo get la cellid 
+            // Cell StartCell = currentMap.CurrentCell;
+            Cell StartCell = currentMap.Cells.OrderBy(x => Guid.NewGuid()).First(x => x.IsWalkable()); //todo get la cellid
             Cell DestinationCell = currentMap.GetCellById(cellId);
             //StringHelper.WriteLine("Start Cellid: " + StartCell.Id, ConsoleColor.Green);
             //StringHelper.WriteLine("Destination Cellid: " + DestinationCell.Id, ConsoleColor.Green);
@@ -152,7 +152,6 @@ namespace RetroCore.Manager.MapManager.PathFinder
 
                 if (checkCell.X == DestinationCell.X && checkCell.Y == DestinationCell.Y)
                     return true;
-                
 
                 visitedCells.Add(checkCell);
                 activeCells.Remove(checkCell);
