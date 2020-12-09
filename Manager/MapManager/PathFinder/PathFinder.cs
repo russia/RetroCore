@@ -132,10 +132,11 @@ namespace RetroCore.Manager.MapManager.PathFinder
             Clear();
             mapCellsWalkable = currentMap.Cells.Where(x => x.IsWalkable() == true).ToList();
             mapCellsWalkable.ForEach(x => ClearCells(x));
-            Cell StartCell = currentMap.CurrentCell;
+           // Cell StartCell = currentMap.CurrentCell;
+            Cell StartCell = currentMap.Cells.First(x => x.IsWalkable());
             Cell DestinationCell = currentMap.GetCellById(cellId);
-            StringHelper.WriteLine("Start cellid: " + StartCell.Id, ConsoleColor.Blue);
-            StringHelper.WriteLine("Destination cellid: " + DestinationCell.Id, ConsoleColor.Blue);
+            StringHelper.WriteLine("Start Cellid: " + StartCell.Id, ConsoleColor.Green);
+            StringHelper.WriteLine("Destination Cellid: " + DestinationCell.Id, ConsoleColor.Green);
 
             List<Cell> Path = new List<Cell>();
             StartCell.SetDistance(StartCell.GetDistance(DestinationCell));
@@ -151,7 +152,19 @@ namespace RetroCore.Manager.MapManager.PathFinder
 
                 if (checkCell.X == DestinationCell.X && checkCell.Y == DestinationCell.Y)
                 {
-                    StringHelper.WriteLine("We found a way !", ConsoleColor.Blue);
+                    StringHelper.WriteLine("We found a way !", ConsoleColor.Green);
+                    //Cell tempCell = checkCell;
+                    //while (true) // while(tempCell.Parent == null) ?
+                    //{
+                    //    if (tempCell.Parent == null)
+                    //        break;
+
+                    //    Path.Add(tempCell.Parent);
+                    //    tempCell = tempCell.Parent;
+                    //}
+                    //Path.Reverse();
+                    //Path.Add(DestinationCell);
+                    //Path.ForEach(x => Console.WriteLine(x.Id + " -> "));
 
                     return true;
                 }
@@ -180,7 +193,7 @@ namespace RetroCore.Manager.MapManager.PathFinder
                 }
             }
 
-            Console.WriteLine("No Path Found!");
+            StringHelper.WriteLine("No Path Found!",ConsoleColor.Green);
             return false;
         }
     }

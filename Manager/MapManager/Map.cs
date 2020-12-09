@@ -27,6 +27,26 @@ namespace RetroCore.Manager.MapManager
         public Cell[] Cells;
 
         public Client Client { get; set; }
+        //WorldPathFinder
+        public Map ParentMap { get; set; } = null;
+        public int Cost { get; set; }
+        public int Distance { get; set; }
+        public int CostDistance => Cost + Distance;
+
+        public void SetParent(Map parent)
+        {
+            ParentMap = parent;
+            Cost++;
+            SetDistance(1);
+        }
+        public int GetDistance(int xDestination, int yDestination) => Math.Abs(XCoord - xDestination) + Math.Abs(YCoord - yDestination);
+        public int GetDistance(Map destinationMap) => Math.Abs(XCoord - destinationMap.XCoord) + Math.Abs(YCoord - destinationMap.YCoord);
+
+        public void SetDistance(int distance)
+        {
+            this.Distance = distance;
+        }
+        /////////
 
         public Map(Client client)
         {

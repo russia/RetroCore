@@ -32,6 +32,7 @@
         TOP,
         BOTTOM,
         LEFT,
-        RIGHT
+        RIGHT,
+        NONE
     }
 }
